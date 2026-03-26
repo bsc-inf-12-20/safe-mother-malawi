@@ -7,7 +7,7 @@ import '../shared/sidebar.dart';
 import '../shared/widgets/kpi_card.dart';
 import '../shared/widgets/chart_card.dart';
 import '../shared/widgets/status_badge.dart';
-import '../auth/login_screen.dart';
+import '../role_selector.dart';
 import 'district_analytics.dart';
 import 'dho_heatmap.dart';
 import 'dho_ivr_insights.dart';
@@ -69,7 +69,7 @@ class _DhoOverviewState extends State<DhoOverview> {
       onNavigate: _navigate,
       onLogout: () => Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => const RoleSelector()),
       ),
       body: _buildPage(),
     );
