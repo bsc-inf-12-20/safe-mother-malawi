@@ -25,7 +25,7 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       height: 64,
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withOpacity(0.9),
+        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.9),
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadowColor,

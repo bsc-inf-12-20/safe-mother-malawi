@@ -116,10 +116,10 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(0.15 + val * 0.3),
+                                  color: color.withValues(alpha: 0.15 + val * 0.3),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: color.withOpacity(0.6), width: 2),
+                                      color: color.withValues(alpha: 0.6), width: 2),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -141,7 +141,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(
@@ -235,8 +235,7 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                                     name: d['name'],
                                     value: _layerValue(d),
                                     color: _heatColor(_layerValue(d)),
-                                  ))
-                              .toList(),
+                                  )),
                         ],
                       ),
                     ),

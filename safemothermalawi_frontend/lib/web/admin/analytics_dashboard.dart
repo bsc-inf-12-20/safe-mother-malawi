@@ -133,7 +133,7 @@ class AnalyticsDashboard extends StatelessWidget {
                           dotData: const FlDotData(show: false),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: AppColors.criticalText.withOpacity(0.07),
+                            color: AppColors.criticalText.withValues(alpha: 0.07),
                           ),
                         ),
                         LineChartBarData(
@@ -147,7 +147,7 @@ class AnalyticsDashboard extends StatelessWidget {
                           dotData: const FlDotData(show: false),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: AppColors.warningText.withOpacity(0.07),
+                            color: AppColors.warningText.withValues(alpha: 0.07),
                           ),
                         ),
                       ],

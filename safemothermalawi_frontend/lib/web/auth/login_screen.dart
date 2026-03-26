@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(Icons.favorite_rounded,
@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Ministry of Health, Malawi\nStaff Portal — Authorized Access Only',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         height: 1.6,
                       ),
                     ),
@@ -443,7 +443,7 @@ class _StatChip extends StatelessWidget {
         Text(label,
             style: GoogleFonts.inter(
                 fontSize: 11,
-                color: Colors.white.withOpacity(0.6))),
+                color: Colors.white.withValues(alpha: 0.6))),
       ],
     );
   }

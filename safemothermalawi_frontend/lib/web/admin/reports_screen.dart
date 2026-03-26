@@ -323,7 +323,7 @@ class _ReportDrop extends StatelessWidget {
                   letterSpacing: 0.8)),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             onChanged: onChanged,
             style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurface),
             decoration: InputDecoration(

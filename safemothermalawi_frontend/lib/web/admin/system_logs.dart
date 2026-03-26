@@ -197,7 +197,7 @@ class _SystemLogsState extends State<SystemLogs> {
                     return Container(
                       color: e.key.isEven
                           ? AppColors.surfaceContainerLowest
-                          : AppColors.pageBg.withOpacity(0.4),
+                          : AppColors.pageBg.withValues(alpha: 0.4),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 12),
                       child: Row(

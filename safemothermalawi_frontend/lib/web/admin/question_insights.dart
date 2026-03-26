@@ -211,7 +211,7 @@ class QuestionInsights extends StatelessWidget {
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: AppColors.successText.withOpacity(0.08),
+                      color: AppColors.successText.withValues(alpha: 0.08),
                     ),
                   ),
                 ],

@@ -107,11 +107,10 @@ class DhoHeatmap extends StatelessWidget {
                                 width: 70,
                                 height: 70,
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(
-                                      0.15 + (z['risk'] as double) * 0.3),
+                                  color: color.withValues(alpha: 0.15 + (z['risk'] as double) * 0.3),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: color.withOpacity(0.6),
+                                      color: color.withValues(alpha: 0.6),
                                       width: 2),
                                 ),
                                 child: Center(
@@ -136,7 +135,7 @@ class DhoHeatmap extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(

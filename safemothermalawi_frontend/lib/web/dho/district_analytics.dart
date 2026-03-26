@@ -129,7 +129,7 @@ class DistrictAnalytics extends StatelessWidget {
                           dotData: const FlDotData(show: false),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: AppColors.criticalText.withOpacity(0.07),
+                            color: AppColors.criticalText.withValues(alpha: 0.07),
                           ),
                         ),
                       ],
@@ -199,7 +199,7 @@ class DistrictAnalytics extends StatelessWidget {
         ),
         BarChartRodData(
           toY: national,
-          color: AppColors.secondary.withOpacity(0.4),
+          color: AppColors.secondary.withValues(alpha: 0.4),
           width: 14,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
         ),
