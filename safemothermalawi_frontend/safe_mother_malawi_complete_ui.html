@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safe Mother Malawi — Complete UI System</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   GLOBAL RESET & TOKENS
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:      #1D9E75;
+  --teal-l:    #E1F5EE;
+  --teal-m:    #9FE1CB;
+  --teal-d:    #085041;
+  --teal-xd:   #04342C;
+  --rose:      #C2506F;
+  --rose-l:    #FDEEF3;
+  --rose-m:    #F5B8CC;
+  --red:       #E24B4A;
+  --red-l:     #FCEBEB;
+  --amber:     #EF9F27;
+  --amber-l:   #FAEEDA;
+  --blue:      #378ADD;
+  --blue-l:    #E6F1FB;
+  --purple:    #7F77DD;
+  --purple-l:  #EEEDFE;
+  --g50:       #F7F6F2;
+  --g100:      #EDECEA;
+  --g200:      #D5D3CC;
+  --g400:      #9B9992;
+  --g600:      #5C5B57;
+  --g800:      #28271F;
+  --serif:     'Fraunces', Georgia, serif;
+  --sans:      'DM Sans', system-ui, sans-serif;
+  --mono:      'DM Mono', monospace;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 22px; --r-2xl: 32px;
+}
+
+body { font-family: var(--sans); background: #1a1a1a; color: var(--g800); }
+
+/* ═══════════════════════════════════════════════
+   MASTER NAVIGATION
+═══════════════════════════════════════════════ */
+.master-nav {
+  position: sticky; top: 0; z-index: 300;
+  background: var(--teal-xd);
+  display: flex; align-items: center;
+  height: 48px; padding: 0 1.25rem; gap: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.brand { font-family: var(--serif); font-size: 15px; font-weight: 600; color: #fff; margin-right: 1rem; letter-spacing: -0.3px; }
+.brand em { color: var(--teal-m); font-style: normal; }
+.nav-btn { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: none; font-family: var(--sans); background: transparent; color: rgba(255,255,255,0.45); transition: all 0.15s; white-space: nowrap; }
+.nav-btn:hover { color: rgba(255,255,255,0.8); }
+.nav-btn.active { background: rgba(255,255,255,0.14); color: #fff; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.nav-tag { background: var(--red); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+
+/* ═══════════════════════════════════════════════
+   ROLE SCREENS
+═══════════════════════════════════════════════ */
+.role-screen { display: none; min-height: calc(100vh - 48px); }
+.role-screen.active { display: block; }
+
+/* ═══════════════════════════════════════════════
+   SPLASH SCREENS
+═══════════════════════════════════════════════ */
+.splash-stage {
+  background: #0e0e0e;
+  min-height: calc(100vh - 48px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 3rem 1.5rem;
+  gap: 3rem;
+}
+.splash-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; margin-bottom: 0.75rem; }
+
+/* Web Splash */
+.web-splash {
+  width: 100%; max-width: 1100px;
+  background: var(--teal-xd);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  min-height: 560px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.ws-left {
+  padding: 3.5rem 3rem;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.ws-left::before {
+  content: '';
+  position: absolute; top: -80px; left: -80px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(29,158,117,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ws-left::after {
+  content: '';
+  position: absolute; bottom: -60px; right: 20px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(159,225,203,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ws-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(29,158,117,0.2);
+  border: 1px solid rgba(29,158,117,0.35);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 11px; font-weight: 600; color: var(--teal-m);
+  margin-bottom: 1.5rem; width: fit-content;
+}
+.ws-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal-m); animation: pulse-dot 2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.ws-title {
+  font-family: var(--serif); font-size: 52px; font-weight: 700;
+  color: #fff; line-height: 1.05; letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+}
+.ws-title em { color: var(--teal-m); font-style: normal; }
+.ws-sub {
+  font-size: 15px; color: rgba(255,255,255,0.55);
+  line-height: 1.7; margin-bottom: 2rem; max-width: 380px;
+}
+.ws-stats {
+  display: flex; gap: 1.75rem; margin-bottom: 2.5rem;
+}
+.ws-stat-val { font-family: var(--serif); font-size: 26px; font-weight: 700; color: #fff; line-height: 1; }
+.ws-stat-lbl { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+.ws-stat-div { width: 1px; background: rgba(255,255,255,0.12); }
+.ws-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ws-btn-primary {
+  background: var(--teal); color: #fff;
+  border: none; border-radius: var(--r-md); padding: 12px 24px;
+  font-size: 13px; font-weight: 600; font-family: var(--sans);
+  cursor: pointer; transition: all 0.15s;
+}
+.ws-btn-primary:hover { background: var(--teal-d); }
+.ws-btn-secondary {
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: var(--r-md);
+  padding: 12px 20px; font-size: 13px; font-weight: 500;
+  font-family: var(--sans); cursor: pointer; transition: all 0.15s;
+}
+.ws-btn-secondary:hover { background: rgba(255,255,255,0.13); color: #fff; }
+.ws-right {
+  background: rgba(0,0,0,0.25);
+  border-left: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center; padding: 2.5rem;
+  gap: 1rem;
+}
+.ws-role-card {
+  width: 100%; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--r-lg); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.15s;
+  text-decoration: none;
+}
+.ws-role-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateX(3px); }
+.ws-role-icon { width: 38px; height: 38px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ws-role-title { font-size: 13px; font-weight: 600; color: #fff; }
+.ws-role-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.ws-role-arrow { margin-left: auto; color: rgba(255,255,255,0.3); font-size: 16px; }
+.ws-footer {
+  padding: 1rem 3rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,0.2);
+  grid-column: 1 / -1;
+}
+.ws-footer-text { font-size: 11px; color: rgba(255,255,255,0.3); }
+.ws-footer-logos { display: flex; gap: 1.5rem; align-items: center; }
+.ws-footer-logo { font-size: 10px; color: rgba(255,255,255,0.25); font-weight: 500; }
+
+/* Mobile splash */
+.mobile-splash-row { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
+.phone-shell {
+  width: 285px;
+  background: #1a1a1a;
+  border-radius: 42px;
+  padding: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+.phone-pill { width: 64px; height: 5px; background: #333; border-radius: 3px; margin: 0 auto 6px; }
+.phone-inner { background: var(--teal-xd); border-radius: 34px; overflow: hidden; min-height: 580px; display: flex; flex-direction: column; }
+
+/* Mobile splash screen content */
+.ms-hero {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative; overflow: hidden;
+}
+.ms-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.ms-logo-mark {
+  width: 72px; height: 72px;
+  background: rgba(29,158,117,0.25);
+  border: 2px solid rgba(29,158,117,0.5);
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.25rem;
+  position: relative; z-index: 1;
+}
+.ms-logo-svg { width: 40px; height: 40px; }
+.ms-title {
+  font-family: var(--serif); font-size: 26px; font-weight: 700;
+  color: #fff; text-align: center; line-height: 1.1; margin-bottom: 6px;
+  position: relative; z-index: 1;
+}
+.ms-title em { color: var(--teal-m); font-style: normal; }
+.ms-tagline {
+  font-size: 11px; color: rgba(255,255,255,0.5);
+  text-align: center; line-height: 1.5; margin-bottom: 2rem;
+  position: relative; z-index: 1;
+}
+.ms-loading {
+  display: flex; gap: 5px; margin-bottom: 2rem;
+  position: relative; z-index: 1;
+}
+.ms-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  animation: ms-load 1.2s ease-in-out infinite;
+}
+.ms-dot:nth-child(1) { animation-delay: 0s; background: var(--teal-m); }
+.ms-dot:nth-child(2) { animation-delay: 0.2s; }
+.ms-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ms-load { 0%,80%,100%{transform:scale(1);opacity:0.4} 40%{transform:scale(1.3);opacity:1} }
+.ms-version { font-size: 10px; color: rgba(255,255,255,0.2); position: relative; z-index: 1; }
+.ms-bottom {
+  background: rgba(0,0,0,0.25);
+  padding: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.ms-moh-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--r-md); padding: 10px 12px;
+}
+.ms-moh-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.ms-moh-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.ms-moh-sub { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+/* ═══════════════════════════════════════════════
+   WEB LAYOUT (Clinician + DHO)
+═══════════════════════════════════════════════ */
+.web-stage { background: #F0EEE8; min-height: calc(100vh - 48px); display: flex; }
+.sidebar {
+  width: 210px; background: #fff; border-right: 1px solid var(--g100);
+  padding: 1.25rem 0; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  min-height: calc(100vh - 48px);
+}
+.sb-logo { padding: 0 1rem 1rem; border-bottom: 1px solid var(--g100); margin-bottom: 0.75rem; }
+.sb-logo-text { font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--teal-d); }
+.sb-logo-text em { color: var(--teal); font-style: normal; }
+.sb-logo-sub { font-size: 10px; color: var(--g400); margin-top: 2px; }
+.sb-section { padding: 0 0.75rem; margin-bottom: 0.375rem; }
+.sb-label { font-size: 9px; font-weight: 700; color: var(--g400); letter-spacing: 0.09em; text-transform: uppercase; padding: 0 0.5rem; margin-bottom: 5px; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 12px; color: var(--g600); cursor: pointer; transition: all 0.12s; margin-bottom: 2px; }
+.sb-item:hover { background: var(--g50); color: var(--g800); }
+.sb-item.active { background: var(--teal-l); color: var(--teal-d); font-weight: 600; }
+.sb-badge { margin-left: auto; background: var(--red-l); color: #791F1F; font-size: 9px; padding: 1px 6px; border-radius: 10px; font-weight: 700; }
+.sb-badge-rose { margin-left: auto; background: var(--rose-l); color: #8B1A38; font-size: 9px; padding: 1px 6px; border-radius: 10px; font-weight: 700; }
+.sb-divider { height: 1px; background: var(--g100); margin: 0.625rem 0.75rem; }
+.sb-user { padding: 0.875rem; margin-top: auto; border-top: 1px solid var(--g100); display: flex; align-items: center; gap: 9px; }
+.sb-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.sb-name { font-size: 11px; font-weight: 600; color: var(--g800); }
+.sb-role { font-size: 9px; color: var(--g400); margin-top: 1px; }
+
+.main-area { flex: 1; overflow: auto; }
+.page { display: none; padding: 1.5rem 1.75rem; }
+.page.active { display: block; }
+
+/* Page header */
+.ph { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+.ph-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--g800); letter-spacing: -0.3px; }
+.ph-sub { font-size: 12px; color: var(--g400); margin-top: 3px; }
+.ph-actions { display: flex; gap: 7px; align-items: center; }
+
+/* Buttons */
+.btn { padding: 7px 14px; border-radius: var(--r-sm); border: 1px solid var(--g200); background: #fff; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--sans); color: var(--g800); transition: all 0.12s; display: inline-flex; align-items: center; gap: 5px; }
+.btn:hover { background: var(--g50); }
+.btn-teal { background: var(--teal); color: #fff; border-color: var(--teal); }
+.btn-teal:hover { background: var(--teal-d); }
+.btn-red { background: var(--red); color: #fff; border-color: var(--red); }
+.btn-rose { background: var(--rose); color: #fff; border-color: var(--rose); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+
+/* Metrics */
+.metrics { display: grid; gap: 10px; margin-bottom: 1.25rem; }
+.metric { background: #fff; border-radius: var(--r-md); padding: 1rem 1.125rem; border: 1px solid var(--g100); }
+.metric-lbl { font-size: 10px; color: var(--g400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.metric-val { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--g800); line-height: 1; }
+.metric-sub { font-size: 10px; color: var(--g400); margin-top: 4px; }
+
+/* Cards */
+.card { background: #fff; border-radius: var(--r-lg); border: 1px solid var(--g100); padding: 1.125rem; }
+.card-title { font-size: 11px; font-weight: 700; color: var(--g800); margin-bottom: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.two-col { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.main-side { display: grid; grid-template-columns: minmax(0,1.65fr) minmax(0,1fr); gap: 10px; margin-bottom: 1.25rem; }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.b-high { background: var(--red-l); color: #791F1F; }
+.b-med { background: var(--amber-l); color: #633806; }
+.b-low { background: var(--teal-l); color: var(--teal-d); }
+.b-blue { background: var(--blue-l); color: #0C447C; }
+.b-rose { background: var(--rose-l); color: #8B1A38; }
+.b-purple { background: var(--purple-l); color: #3C3489; }
+
+/* Table */
+.dt { width: 100%; border-collapse: collapse; font-size: 12px; }
+.dt th { text-align: left; padding: 7px 10px; color: var(--g400); font-weight: 700; border-bottom: 1px solid var(--g100); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+.dt td { padding: 9px 10px; border-bottom: 1px solid var(--g50); color: var(--g800); vertical-align: middle; }
+.dt tr:last-child td { border-bottom: none; }
+.dt tr:hover td { background: var(--g50); }
+
+/* Form */
+.fg { margin-bottom: 10px; }
+.fl { font-size: 10px; color: var(--g400); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
+.fi { width: 100%; padding: 8px 10px; border: 1px solid var(--g200); border-radius: var(--r-sm); font-size: 12px; font-family: var(--sans); color: var(--g800); background: var(--g50); outline: none; transition: border 0.12s; }
+.fi:focus { border-color: var(--teal); background: #fff; }
+.fs { width: 100%; padding: 8px 10px; border: 1px solid var(--g200); border-radius: var(--r-sm); font-size: 12px; font-family: var(--sans); color: var(--g800); background: var(--g50); }
+.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Vitals */
+.vitals { display: grid; gap: 7px; margin-bottom: 0.875rem; }
+.v-card { background: var(--g50); border-radius: var(--r-sm); padding: 9px; border: 1px solid var(--g100); }
+.v-name { font-size: 9px; color: var(--g400); font-weight: 700; text-transform: uppercase; }
+.v-val { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--g800); margin: 3px 0 1px; line-height: 1; }
+.v-unit { font-size: 9px; color: var(--g400); }
+.v-status { font-size: 9px; padding: 2px 6px; border-radius: 10px; display: inline-block; margin-top: 4px; font-weight: 600; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before { content: ''; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 1px; background: var(--g200); }
+.tl-item { position: relative; margin-bottom: 14px; }
+.tl-dot { position: absolute; left: -17px; width: 9px; height: 9px; border-radius: 50%; top: 3px; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--g200); }
+.tl-t { font-size: 11px; font-weight: 600; color: var(--g800); }
+.tl-s { font-size: 10px; color: var(--g400); margin-top: 2px; }
+
+/* Risk bar */
+.rbar-wrap { background: var(--g100); border-radius: 4px; height: 6px; overflow: hidden; margin: 5px 0; }
+.rbar-fill { height: 100%; border-radius: 4px; }
+
+/* Alert items */
+.al { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid; margin-bottom: 7px; }
+.al.crit { border-color: #F7C1C1; background: var(--red-l); }
+.al.warn { border-color: #FAC775; background: var(--amber-l); }
+.al.ok   { border-color: var(--teal-m); background: var(--teal-l); }
+.al-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.al-title { font-size: 11px; font-weight: 700; }
+.al-sub { font-size: 10px; margin-top: 2px; }
+.al-time { margin-left: auto; font-size: 9px; color: var(--g400); white-space: nowrap; }
+
+/* Notif items */
+.ni { display: flex; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--g100); align-items: flex-start; }
+.ni-icon { width: 34px; height: 34px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.ni-title { font-size: 12px; font-weight: 600; color: var(--g800); }
+.ni-sub { font-size: 10px; color: var(--g400); margin-top: 2px; line-height: 1.4; }
+.ni-time { font-size: 9px; color: var(--g400); margin-left: auto; white-space: nowrap; }
+.ni.unread .ni-title { color: var(--teal-d); }
+
+/* Bar chart */
+.barchart { display: flex; align-items: flex-end; gap: 5px; height: 90px; }
+.bc-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 3px; }
+.bc-bar { width: 100%; border-radius: 3px 3px 0 0; }
+.bc-lbl { font-size: 8px; color: var(--g400); }
+.bc-val { font-size: 8px; font-weight: 700; color: var(--g600); }
+
+/* Section header */
+.sh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.sh-title { font-size: 11px; font-weight: 700; color: var(--g800); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE APP STAGES
+═══════════════════════════════════════════════ */
+.mobile-stage { background: #EEECE6; min-height: calc(100vh - 48px); padding: 2rem 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+.screen-label { font-size: 9px; font-weight: 700; color: var(--g400); text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 8px; }
+
+/* phone screens */
+.ps-bar { display: flex; justify-content: space-between; padding: 8px 14px 4px; font-size: 10px; font-weight: 600; }
+.ps-header { padding: 14px 16px 18px; }
+.ps-body { padding: 14px; background: var(--g50); min-height: 380px; }
+.ps-nav { display: flex; justify-content: space-around; background: #fff; border-top: 1px solid var(--g100); padding: 8px 0 4px; }
+.ps-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 10px; border-radius: 8px; cursor: pointer; }
+.ps-nav-item.active { background: var(--teal-l); }
+.ps-nav-lbl { font-size: 8px; font-weight: 600; color: var(--g400); }
+.ps-nav-item.active .ps-nav-lbl { color: var(--teal-d); }
+.ps-nav-icon { font-size: 15px; line-height: 1; }
+
+/* mobile card */
+.m-card { background: #fff; border-radius: var(--r-md); padding: 12px; margin-bottom: 10px; border: 1px solid var(--g100); }
+.m-title { font-size: 13px; font-weight: 700; color: var(--g800); }
+.m-sub { font-size: 11px; color: var(--g400); margin-top: 2px; line-height: 1.4; }
+.m-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.m-menu-item { background: #fff; border-radius: var(--r-md); padding: 11px; border: 1px solid var(--g100); display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+.m-icon-box { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.m-item-title { font-size: 11px; font-weight: 700; color: var(--g800); }
+.m-item-sub { font-size: 9px; color: var(--g400); }
+.m-alert { display: flex; gap: 8px; align-items: flex-start; border-radius: var(--r-sm); padding: 9px 11px; margin-bottom: 8px; border: 1px solid; }
+.sos-btn { width: 100%; background: var(--red); color: #fff; border: none; border-radius: var(--r-md); padding: 11px; font-size: 12px; font-weight: 700; font-family: var(--sans); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.week-dots { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 7px; }
+.wd { width: 7px; height: 7px; border-radius: 50%; background: var(--g200); }
+.wd.on { background: var(--teal); }
+
+/* baby card */
+.baby-card { background: var(--rose-l); border: 1px solid var(--rose-m); border-radius: var(--r-md); padding: 11px; margin-bottom: 10px; }
+.baby-title { font-size: 12px; font-weight: 700; color: #8B1A38; }
+.baby-vitals { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+.bv { background: #fff; border-radius: 6px; padding: 7px; text-align: center; }
+.bv-val { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--g800); }
+.bv-lbl { font-size: 9px; color: var(--g400); }
+
+/* q-card */
+.q-card { border: 1px solid var(--g200); border-radius: var(--r-md); padding: 11px; margin-bottom: 7px; }
+.q-text { font-size: 12px; font-weight: 600; color: var(--g800); margin-bottom: 9px; line-height: 1.4; }
+.q-ans { display: flex; gap: 6px; }
+.q-btn { flex: 1; padding: 7px; border: 1px solid var(--g200); border-radius: var(--r-sm); background: var(--g50); font-size: 10px; cursor: pointer; font-family: var(--sans); font-weight: 700; color: var(--g600); }
+.q-btn.yes { border-color: var(--red); background: var(--red-l); color: #791F1F; }
+.q-btn.no  { border-color: var(--teal); background: var(--teal-l); color: var(--teal-d); }
+
+/* login card */
+.login-card { background: #fff; border-radius: var(--r-xl); padding: 2rem; width: 360px; border: 1px solid var(--g100); box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+.lc-mark { width: 48px; height: 48px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+.lc-title { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--g800); text-align: center; }
+.lc-sub { font-size: 11px; color: var(--g400); text-align: center; margin-top: 3px; }
+.mode-opt { border: 2px solid var(--g200); border-radius: var(--r-md); padding: 12px 8px; cursor: pointer; text-align: center; transition: all 0.15s; position: relative; }
+.mode-opt.sel-preg { border-color: var(--teal); background: var(--teal-l); }
+.mode-opt.sel-post { border-color: var(--rose); background: var(--rose-l); }
+.mode-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+.mode-title { font-size: 12px; font-weight: 700; color: var(--g800); }
+.mode-sub { font-size: 10px; color: var(--g400); margin-top: 2px; }
+.mode-check { position: absolute; top: 6px; right: 8px; font-size: 12px; }
+.staff-opt { border: 1.5px solid var(--g200); border-radius: var(--r-sm); padding: 10px; cursor: pointer; text-align: center; transition: all 0.15s; }
+.staff-opt:hover { border-color: var(--teal); }
+.staff-opt.sel { border-color: var(--teal); background: var(--teal-l); }
+.staff-icon { font-size: 18px; margin-bottom: 3px; }
+.staff-lbl { font-size: 11px; font-weight: 700; color: var(--g800); }
+.info-pill { background: var(--blue-l); border: 1px solid #B5D4F4; border-radius: var(--r-sm); padding: 8px 10px; font-size: 10px; color: #0C447C; font-weight: 500; margin-top: 8px; display: flex; align-items: flex-start; gap: 6px; }
+
+/* IVR */
+.ivr-wrap { background: #141425; border-radius: var(--r-xl); padding: 1.5rem; max-width: 280px; margin: 0 auto; }
+.ivr-screen { background: #080F1E; border-radius: var(--r-md); padding: 1rem; margin-bottom: 1rem; font-family: var(--mono); }
+.ivr-hd { color: #5DCAA5; font-size: 10px; font-weight: 500; margin-bottom: 6px; }
+.ivr-line { color: rgba(255,255,255,0.55); font-size: 10px; margin-bottom: 3px; line-height: 1.5; }
+.ivr-line.hi { color: #9FE1CB; }
+.ivr-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.ivr-key { background: #22223A; border: none; border-radius: var(--r-sm); padding: 9px; text-align: center; cursor: pointer; font-family: var(--sans); }
+.ivr-num { font-size: 15px; font-weight: 700; color: #fff; display: block; }
+.ivr-lbl { font-size: 7px; color: rgba(255,255,255,0.4); margin-top: 2px; display: block; }
+.ivr-sos { background: var(--red); border: none; border-radius: var(--r-sm); padding: 9px; font-family: var(--sans); font-size: 12px; font-weight: 700; color: #fff; width: 100%; cursor: pointer; margin-top: 7px; }
+
+/* report header */
+.report-hd { background: var(--teal); border-radius: var(--r-md); padding: 1.25rem; color: #fff; margin-bottom: 1.25rem; }
+.report-title { font-family: var(--serif); font-size: 18px; font-weight: 700; }
+.report-meta { font-size: 11px; opacity: 0.75; margin-top: 3px; }
+.report-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-top: 0.875rem; }
+.rs { background: rgba(255,255,255,0.15); border-radius: var(--r-sm); padding: 9px; }
+.rs-val { font-family: var(--serif); font-size: 20px; font-weight: 700; }
+.rs-lbl { font-size: 9px; opacity: 0.8; margin-top: 1px; }
+
+/* heatmap */
+.heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.hm-cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
+
+/* three-col */
+.three-col { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 1.25rem; }
+</style>
+</head>
+<body>
+
+<!-- MASTER NAV -->
+<nav class="master-nav">
+  <div class="brand">Safe Mother <em>MW</em></div>
+  <button class="nav-btn active" onclick="showRole('splash')">Splash screens</button>
+  <button class="nav-btn" onclick="showRole('login')">Login / Auth</button>
+  <button class="nav-btn" onclick="showRole('pregnant')">Pregnant app</button>
+  <button class="nav-btn" onclick="showRole('postnatal')">Postnatal app</button>
+  <button class="nav-btn" onclick="showRole('clinician')">Clinician</button>
+  <button class="nav-btn" onclick="showRole('dho')">DHO / Admin</button>
+  <div class="nav-right">
+    <span class="nav-tag">3 alerts</span>
+    <div style="width:26px;height:26px;background:rgba(255,255,255,0.14);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">AP</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════ SPLASH SCREENS ═══════════════════ -->
+<div id="role-splash" class="role-screen active">
+  <div class="splash-stage">
+
+    <!-- Web splash -->
+    <div style="width:100%;max-width:1100px;">
+      <div class="splash-label">Web splash — all users see this on first visit or page load</div>
+      <div class="web-splash">
+        <div class="ws-left">
+          <div class="ws-badge"><div class="ws-badge-dot"></div>Ministry of Health · Malawi</div>
+          <div class="ws-title">Safe Mother<br><em>Malawi</em></div>
+          <p class="ws-sub">A low-bandwidth digital ecosystem for maternal and neonatal health — connecting pregnant women, postnatal mothers, clinicians, and district health offices across Malawi.</p>
+          <div class="ws-stats">
+            <div><div class="ws-stat-val">1,284</div><div class="ws-stat-lbl">Registered mothers</div></div>
+            <div class="ws-stat-div"></div>
+            <div><div class="ws-stat-val">7</div><div class="ws-stat-lbl">Health zones</div></div>
+            <div class="ws-stat-div"></div>
+            <div><div class="ws-stat-val">76%</div><div class="ws-stat-lbl">ANC attendance</div></div>
+          </div>
+          <div class="ws-actions">
+            <button class="ws-btn-primary" onclick="showRole('login')">Sign in to portal →</button>
+            <button class="ws-btn-secondary">Download app</button>
+          </div>
+        </div>
+        <div class="ws-right">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;align-self:flex-start;">Sign in as</div>
+          <div class="ws-role-card" onclick="showRole('login')">
+            <div class="ws-role-icon" style="background:rgba(29,158,117,0.2);">🤰</div>
+            <div><div class="ws-role-title">Pregnant mother</div><div class="ws-role-sub">ANC tracking · danger signs · education</div></div>
+            <span class="ws-role-arrow">›</span>
+          </div>
+          <div class="ws-role-card" onclick="showRole('login')">
+            <div class="ws-role-icon" style="background:rgba(194,80,111,0.2);">👶</div>
+            <div><div class="ws-role-title">Postnatal mother</div><div class="ws-role-sub">PNC visits · baby tracker · mood check</div></div>
+            <span class="ws-role-arrow">›</span>
+          </div>
+          <div class="ws-role-card" onclick="showRole('clinician')">
+            <div class="ws-role-icon" style="background:rgba(55,138,221,0.2);">🩺</div>
+            <div><div class="ws-role-title">Clinician</div><div class="ws-role-sub">Patient management · consultations · alerts</div></div>
+            <span class="ws-role-arrow">›</span>
+          </div>
+          <div class="ws-role-card" onclick="showRole('dho')">
+            <div class="ws-role-icon" style="background:rgba(127,119,221,0.2);">📊</div>
+            <div><div class="ws-role-title">DHO / Administrator</div><div class="ws-role-sub">District analytics · reports · system admin</div></div>
+            <span class="ws-role-arrow">›</span>
+          </div>
+          <div style="width:100%;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;display:flex;align-items:center;gap:8px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#5DCAA5;animation:pulse-dot 2s ease-in-out infinite;"></div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.35);">System operational · Last sync 2 min ago</span>
+          </div>
+        </div>
+        <div class="ws-footer">
+          <span class="ws-footer-text">© 2025 Ministry of Health, Malawi · Safe Mother Malawi v1.0 · Zomba District</span>
+          <div class="ws-footer-logos">
+            <span class="ws-footer-logo">Ministry of Health</span>
+            <span style="color:rgba(255,255,255,0.1);">|</span>
+            <span class="ws-footer-logo">WHO Partner</span>
+            <span style="color:rgba(255,255,255,0.1);">|</span>
+            <span class="ws-footer-logo">UNICEF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile splashes -->
+    <div style="width:100%;max-width:1100px;">
+      <div class="splash-label">Mobile splash screens — shown on app open (Android / iOS)</div>
+      <div class="mobile-splash-row">
+
+        <!-- Generic / loading splash -->
+        <div>
+          <div class="screen-label">App loading splash</div>
+          <div class="phone-shell">
+            <div class="phone-pill"></div>
+            <div class="phone-inner" style="background:var(--teal-xd);">
+              <div class="ms-hero" style="min-height:580px;">
+                <div class="ms-bg-circle" style="width:280px;height:280px;top:-80px;left:-60px;background:radial-gradient(circle,rgba(29,158,117,0.2) 0%,transparent 70%);"></div>
+                <div class="ms-bg-circle" style="width:200px;height:200px;bottom:-40px;right:-40px;background:radial-gradient(circle,rgba(159,225,203,0.1) 0%,transparent 70%);"></div>
+                <div class="ms-logo-mark">
+                  <svg class="ms-logo-svg" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="rgba(29,158,117,0.3)" stroke="#9FE1CB" stroke-width="1.5"/>
+                    <path d="M20 10 C14 10 10 14 10 20 C10 26 14 30 20 30" stroke="#9FE1CB" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path d="M20 10 C26 10 30 14 30 20 C30 26 26 30 20 30" stroke="rgba(159,225,203,0.5)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <circle cx="20" cy="20" r="5" fill="#9FE1CB"/>
+                    <circle cx="20" cy="20" r="2.5" fill="#fff"/>
+                  </svg>
+                </div>
+                <div class="ms-title">Safe Mother<br><em>Malawi</em></div>
+                <p class="ms-tagline">Maternal & neonatal health<br>for every woman in Malawi</p>
+                <div class="ms-loading">
+                  <div class="ms-dot"></div>
+                  <div class="ms-dot"></div>
+                  <div class="ms-dot"></div>
+                </div>
+                <div class="ms-version">v1.0.0 · Ministry of Health</div>
+              </div>
+              <div class="ms-bottom">
+                <div class="ms-moh-badge">
+                  <div class="ms-moh-icon">🏥</div>
+                  <div><div class="ms-moh-name">Ministry of Health</div><div class="ms-moh-sub">Republic of Malawi · Zomba District</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pregnant mode splash (after login) -->
+        <div>
+          <div class="screen-label">Pregnant mode welcome</div>
+          <div class="phone-shell">
+            <div class="phone-pill"></div>
+            <div class="phone-inner" style="background:var(--teal-xd);">
+              <div class="ms-hero" style="min-height:480px;">
+                <div class="ms-bg-circle" style="width:240px;height:240px;top:-60px;right:-60px;background:radial-gradient(circle,rgba(29,158,117,0.25) 0%,transparent 70%);"></div>
+                <div style="width:80px;height:80px;background:rgba(29,158,117,0.2);border:2px solid rgba(159,225,203,0.5);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:1.25rem;position:relative;z-index:1;">🤰</div>
+                <div style="font-size:11px;font-weight:600;color:var(--teal-m);margin-bottom:6px;position:relative;z-index:1;letter-spacing:0.05em;">MWADZIWANI · WELCOME</div>
+                <div class="ms-title" style="font-size:22px;">Grace Nkosi</div>
+                <p class="ms-tagline" style="margin-bottom:1.5rem;">Week 28 · Third Trimester<br>ANC due in 4 days</p>
+                <div style="background:rgba(29,158,117,0.2);border:1px solid rgba(29,158,117,0.35);border-radius:var(--r-md);padding:10px 16px;position:relative;z-index:1;width:100%;margin-bottom:1.25rem;">
+                  <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;">Next appointment</div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;">24 January · Zomba Central</div>
+                </div>
+                <div style="width:30px;height:4px;border-radius:2px;background:var(--teal);margin-bottom:6px;animation:pulse-dot 1.5s ease-in-out infinite;position:relative;z-index:1;"></div>
+              </div>
+              <div class="ms-bottom" style="background:rgba(0,0,0,0.3);">
+                <button style="width:100%;background:var(--teal);color:#fff;border:none;border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;">Enter app →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Postnatal mode splash -->
+        <div>
+          <div class="screen-label">Postnatal mode welcome</div>
+          <div class="phone-shell">
+            <div class="phone-pill"></div>
+            <div class="phone-inner" style="background:#3D0A1C;">
+              <div class="ms-hero" style="min-height:480px;background:linear-gradient(160deg,#4A1228 0%,#3D0A1C 100%);">
+                <div class="ms-bg-circle" style="width:240px;height:240px;top:-60px;right:-60px;background:radial-gradient(circle,rgba(194,80,111,0.25) 0%,transparent 70%);"></div>
+                <div style="width:80px;height:80px;background:rgba(194,80,111,0.2);border:2px solid rgba(245,184,204,0.5);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:1.25rem;position:relative;z-index:1;">👶</div>
+                <div style="font-size:11px;font-weight:600;color:var(--rose-m);margin-bottom:6px;position:relative;z-index:1;letter-spacing:0.05em;">MWADZIWANI · WELCOME</div>
+                <div class="ms-title" style="font-size:22px;">Grace Nkosi</div>
+                <p class="ms-tagline" style="margin-bottom:1.5rem;color:rgba(255,255,255,0.5);">Postnatal · Day 8<br>Baby Chisomo is healthy ✓</p>
+                <div style="background:rgba(194,80,111,0.2);border:1px solid rgba(194,80,111,0.4);border-radius:var(--r-md);padding:10px 16px;position:relative;z-index:1;width:100%;margin-bottom:1.25rem;">
+                  <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:3px;">PNC visit due</div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;">Day 14 — 29 January</div>
+                </div>
+                <div style="width:30px;height:4px;border-radius:2px;background:var(--rose);margin-bottom:6px;animation:pulse-dot 1.5s ease-in-out infinite;position:relative;z-index:1;"></div>
+              </div>
+              <div class="ms-bottom" style="background:rgba(0,0,0,0.4);">
+                <button style="width:100%;background:var(--rose);color:#fff;border:none;border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;">Enter app →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff splash -->
+        <div>
+          <div class="screen-label">Staff / clinician splash</div>
+          <div class="phone-shell">
+            <div class="phone-pill"></div>
+            <div class="phone-inner" style="background:#0E1E35;">
+              <div class="ms-hero" style="min-height:480px;background:linear-gradient(160deg,#112240 0%,#0E1E35 100%);">
+                <div class="ms-bg-circle" style="width:240px;height:240px;top:-60px;right:-60px;background:radial-gradient(circle,rgba(55,138,221,0.2) 0%,transparent 70%);"></div>
+                <div style="width:80px;height:80px;background:rgba(55,138,221,0.15);border:2px solid rgba(181,212,244,0.4);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:1.25rem;position:relative;z-index:1;">🩺</div>
+                <div style="font-size:11px;font-weight:600;color:#85B7EB;margin-bottom:6px;position:relative;z-index:1;letter-spacing:0.05em;">STAFF PORTAL</div>
+                <div class="ms-title" style="font-size:22px;">Agnes Phiri</div>
+                <p class="ms-tagline" style="color:rgba(255,255,255,0.45);margin-bottom:1.5rem;">Clinician · Zomba Central<br>Zone 4</p>
+                <div style="background:rgba(55,138,221,0.15);border:1px solid rgba(55,138,221,0.3);border-radius:var(--r-md);padding:10px 16px;position:relative;z-index:1;width:100%;margin-bottom:1.25rem;">
+                  <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">Today's schedule</div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;">4 patients · 3 alerts</div>
+                </div>
+                <div style="width:30px;height:4px;border-radius:2px;background:#378ADD;margin-bottom:6px;animation:pulse-dot 1.5s ease-in-out infinite;position:relative;z-index:1;"></div>
+              </div>
+              <div class="ms-bottom" style="background:rgba(0,0,0,0.4);">
+                <button style="width:100%;background:#378ADD;color:#fff;border:none;border-radius:var(--r-md);padding:12px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;">Open dashboard →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ LOGIN / AUTH ═══════════════════ -->
+<div id="role-login" class="role-screen">
+  <div class="mobile-stage" style="background:#F0EEE8;">
+    <!-- Patient login -->
+    <div>
+      <div class="screen-label">Patient login (shared)</div>
+      <div class="login-card">
+        <div style="text-align:center;margin-bottom:1.5rem;">
+          <div class="lc-mark" style="background:var(--teal);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.15)"/><circle cx="12" cy="12" r="5" fill="white"/><circle cx="12" cy="12" r="2.5" fill="rgba(29,158,117,0.6)"/></svg>
+          </div>
+          <div class="lc-title">Safe Mother Malawi</div>
+          <div class="lc-sub">Sign in to your account</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">I am logging in as a…</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0.75rem;">
+          <div class="mode-opt sel-preg"><span class="mode-emoji">🤰</span><div class="mode-title">Pregnant mother</div><div class="mode-sub">Currently expecting</div><span class="mode-check">✓</span></div>
+          <div class="mode-opt"><span class="mode-emoji">👶</span><div class="mode-title">Postnatal mother</div><div class="mode-sub">Recently delivered</div><span class="mode-check" style="display:none;">✓</span></div>
+        </div>
+        <div class="info-pill">ℹ Same phone number and PIN for both modes. Your profile switches automatically.</div>
+        <div style="height:12px;"></div>
+        <div class="fg"><label class="fl">Phone number</label><input class="fi" placeholder="+265 999 000 000"></div>
+        <div class="fg"><label class="fl">4-digit PIN</label><input class="fi" type="password" placeholder="Enter your PIN" maxlength="4"></div>
+        <button class="btn btn-teal" style="width:100%;justify-content:center;padding:10px;margin-top:4px;">Sign in →</button>
+        <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--g400);">No smartphone? Dial <strong>800-SAFE-MOM</strong></div>
+        <div style="text-align:center;margin-top:4px;font-size:11px;color:var(--g400);">New patient? Ask your clinician to register you</div>
+      </div>
+    </div>
+
+    <!-- Register step 1 -->
+    <div>
+      <div class="screen-label">Patient registration (mobile)</div>
+      <div class="phone-shell" style="width:290px;">
+        <div class="phone-pill"></div>
+        <div class="phone-inner">
+          <div class="ps-bar" style="background:var(--teal);color:#fff;"><span>9:41</span><span>Register</span></div>
+          <div class="ps-header" style="background:var(--teal);padding-bottom:20px;">
+            <div style="color:#fff;font-size:14px;font-weight:700;">Create account</div>
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">Step 1 of 3 — Your details</div>
+            <div style="background:rgba(255,255,255,0.2);border-radius:3px;height:4px;margin-top:8px;overflow:hidden;"><div style="background:#fff;width:33%;height:100%;border-radius:3px;"></div></div>
+          </div>
+          <div class="ps-body">
+            <div class="fg"><label class="fl">Full name</label><input class="fi" style="font-size:11px;" placeholder="e.g. Grace Nkosi"></div>
+            <div class="fg"><label class="fl">Phone number</label><input class="fi" style="font-size:11px;" placeholder="+265 999 000 000"></div>
+            <div class="fg"><label class="fl">District</label><select class="fs" style="font-size:11px;"><option>Zomba</option><option>Blantyre</option><option>Lilongwe</option></select></div>
+            <div class="fg"><label class="fl">Language</label><select class="fs" style="font-size:11px;"><option>Chichewa</option><option>English</option></select></div>
+            <div class="fg"><label class="fl">Create a 4-digit PIN</label><input class="fi" type="password" style="font-size:11px;" maxlength="4" placeholder="e.g. 4821"></div>
+            <button class="btn btn-teal" style="width:100%;justify-content:center;font-size:11px;margin-top:4px;">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff login -->
+    <div>
+      <div class="screen-label">Staff login (clinician / DHO)</div>
+      <div class="login-card" style="width:340px;">
+        <div style="text-align:center;margin-bottom:1.5rem;">
+          <div class="lc-mark" style="background:var(--g800);">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="8" height="8" rx="2" fill="rgba(255,255,255,0.4)"/><rect x="12" y="2" width="8" height="8" rx="2" fill="white"/><rect x="2" y="12" width="8" height="8" rx="2" fill="white"/><rect x="12" y="12" width="8" height="8" rx="2" fill="rgba(255,255,255,0.4)"/></svg>
+          </div>
+          <div class="lc-title">Staff Portal</div>
+          <div class="lc-sub">Ministry of Health credentials</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Select your role</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1rem;">
+          <div class="staff-opt sel"><div class="staff-icon">🩺</div><div class="staff-lbl">Clinician</div></div>
+          <div class="staff-opt"><div class="staff-icon">📊</div><div class="staff-lbl">DHO / Admin</div></div>
+        </div>
+        <div class="fg"><label class="fl">Staff ID / email</label><input class="fi" placeholder="e.g. A.Phiri@moh.mw"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" placeholder="Your password"></div>
+        <button class="btn btn-teal" style="width:100%;justify-content:center;padding:10px;">Sign in →</button>
+      </div>
+    </div>
+
+    <!-- IVR -->
+    <div>
+      <div class="screen-label">IVR — feature phone access</div>
+      <div class="ivr-wrap">
+        <div class="ivr-screen">
+          <div class="ivr-hd">📞  800-SAFE-MOM  ● 00:42</div>
+          <div class="ivr-line hi">Moni. Mukalandira pa Safe Mother.</div>
+          <div class="ivr-line">Hello. Welcome to Safe Mother Malawi.</div>
+          <div style="height:7px;"></div>
+          <div class="ivr-line hi">Press 1 — Nkhani za mimba</div>
+          <div class="ivr-line hi">Press 2 — Zizindikiro zoopsya</div>
+          <div class="ivr-line hi">Press 3 — Chipatala chanu</div>
+          <div class="ivr-line hi">Press 4 — Thandizo la pogwetsera</div>
+          <div class="ivr-line hi">Press 5 — Umboni wa mwana wako</div>
+          <div style="height:7px;"></div>
+          <div style="color:#FAC775;font-size:9px;">Connected · Zomba · Chichewa</div>
+        </div>
+        <div class="ivr-keypad">
+          <button class="ivr-key"><span class="ivr-num">1</span><span class="ivr-lbl">Pregnancy tips</span></button>
+          <button class="ivr-key"><span class="ivr-num">2</span><span class="ivr-lbl">Danger signs</span></button>
+          <button class="ivr-key"><span class="ivr-num">3</span><span class="ivr-lbl">Appointment</span></button>
+          <button class="ivr-key"><span class="ivr-num">4</span><span class="ivr-lbl">Emergency</span></button>
+          <button class="ivr-key"><span class="ivr-num">5</span><span class="ivr-lbl">Baby info</span></button>
+          <button class="ivr-key"><span class="ivr-num">#</span><span class="ivr-lbl">Main menu</span></button>
+        </div>
+        <button class="ivr-sos">🆘 Emergency line</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PREGNANT APP ═══════════════════ -->
+<div id="role-pregnant" class="role-screen">
+  <div class="mobile-stage">
+    <!-- Home -->
+    <div><div class="screen-label">Home</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:var(--teal);color:#fff;"><span>9:41</span><span>Safe Mother MW</span></div><div class="ps-header" style="background:var(--teal);padding-bottom:18px;"><div style="color:rgba(255,255,255,0.7);font-size:10px;">Mwadziwani,</div><div style="color:#fff;font-size:16px;font-weight:700;margin-top:1px;">Grace Nkosi</div><div style="display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:9px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;">🤰 Week 28 · Third Trimester</div></div><div class="ps-body"><div class="m-alert" style="border-color:#F7C1C1;background:var(--red-l);margin-bottom:10px;"><div style="width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:3px;"></div><div style="font-size:10px;font-weight:700;color:#791F1F;">Reduced fetal movement — check danger signs</div></div><div class="m-card"><div style="font-size:9px;font-weight:700;color:var(--teal);margin-bottom:2px;">WEEK 28 PROGRESS</div><div class="m-title">Baby ~37cm · Eyes can open now</div><div class="m-sub">Drink water, rest often. ANC in 4 days.</div><div class="week-dots"><div class="wd on"></div><div class="wd on"></div><div class="wd on"></div><div class="wd on"></div><div class="wd on"></div><div class="wd on"></div><div class="wd on"></div><div class="wd"></div><div class="wd"></div><div class="wd"></div></div></div><div class="m-grid2"><div class="m-menu-item"><div class="m-icon-box" style="background:var(--red-l);">🚨</div><div class="m-item-title">Danger signs</div><div class="m-item-sub">Know warnings</div></div><div class="m-menu-item"><div class="m-icon-box" style="background:var(--blue-l);">📅</div><div class="m-item-title">ANC visits</div><div class="m-item-sub">Next: Jan 24</div></div><div class="m-menu-item"><div class="m-icon-box" style="background:var(--amber-l);">🥗</div><div class="m-item-title">Nutrition</div><div class="m-item-sub">Weekly tips</div></div><div class="m-menu-item"><div class="m-icon-box" style="background:var(--purple-l);">❤️</div><div class="m-item-title">Health check</div><div class="m-item-sub">Quick check</div></div></div><div class="m-card" style="display:flex;gap:10px;align-items:center;"><div style="background:var(--teal-l);border-radius:8px;padding:7px 10px;text-align:center;flex-shrink:0;"><div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--teal-d);line-height:1;">24</div><div style="font-size:9px;font-weight:700;color:var(--teal);">JAN</div></div><div><div class="m-title">ANC Visit — Zomba Central</div><div class="m-sub">Agnes Phiri · 10:00am</div></div></div><button class="sos-btn">🆘 Emergency — Call for Help</button></div><div class="ps-nav"><div class="ps-nav-item active"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item"><div class="ps-nav-icon">❤️</div><div class="ps-nav-lbl">Health</div></div><div class="ps-nav-item"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+
+    <!-- Health check -->
+    <div><div class="screen-label">Health check</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:var(--teal);color:#fff;"><span>9:41</span><span>Health Check</span></div><div class="ps-header" style="background:var(--teal);"><div style="color:#fff;font-size:14px;font-weight:700;">Weekly Health Check</div><div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">Question 3 of 8</div><div style="background:rgba(255,255,255,0.2);border-radius:3px;height:4px;margin-top:7px;overflow:hidden;"><div style="background:#fff;width:37%;height:100%;border-radius:3px;"></div></div></div><div class="ps-body"><div class="q-card"><div style="font-size:9px;font-weight:700;color:var(--red);margin-bottom:5px;text-transform:uppercase;">Danger sign</div><div class="q-text">Are you experiencing severe headaches or blurred vision?</div><div class="q-ans"><button class="q-btn yes">Yes</button><button class="q-btn no">No ✓</button></div></div><div class="q-card"><div style="font-size:9px;font-weight:700;color:var(--amber);margin-bottom:5px;text-transform:uppercase;">Fetal movement</div><div class="q-text">Is your baby moving normally today?</div><div class="q-ans"><button class="q-btn">Yes</button><button class="q-btn" style="border-color:var(--amber);background:var(--amber-l);color:#633806;">Not sure</button><button class="q-btn">No</button></div></div><div class="q-card"><div style="font-size:9px;font-weight:700;color:var(--blue);margin-bottom:5px;text-transform:uppercase;">Bleeding</div><div class="q-text">Any vaginal bleeding this week?</div><div class="q-ans"><button class="q-btn">Yes</button><button class="q-btn no">No ✓</button></div></div><button class="btn btn-teal" style="width:100%;justify-content:center;font-size:11px;margin-top:6px;">Continue →</button></div><div class="ps-nav"><div class="ps-nav-item"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item active"><div class="ps-nav-icon">❤️</div><div class="ps-nav-lbl">Health</div></div><div class="ps-nav-item"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+
+    <!-- Danger signs -->
+    <div><div class="screen-label">Danger signs</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:var(--teal);color:#fff;"><span>9:41</span><span>Danger Signs</span></div><div class="ps-header" style="background:var(--teal);"><div style="color:#fff;font-size:14px;font-weight:700;">Danger Signs</div><div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">Go to clinic immediately if you notice:</div></div><div class="ps-body"><div class="m-card" style="border-left:3px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:7px;"><div class="m-title" style="color:#791F1F;">🩸 Vaginal bleeding</div><div class="m-sub">Any bleeding during pregnancy is serious. Go to the clinic now.</div></div><div class="m-card" style="border-left:3px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:7px;"><div class="m-title" style="color:#791F1F;">🤕 Severe headache / blurred vision</div><div class="m-sub">May be pre-eclampsia. Seek help immediately.</div></div><div class="m-card" style="border-left:3px solid var(--amber);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:7px;"><div class="m-title" style="color:#633806;">👣 Baby not moving &gt; 2 hours</div><div class="m-sub">Contact your clinician right away.</div></div><div class="m-card" style="border-left:3px solid var(--amber);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:7px;"><div class="m-title" style="color:#633806;">🦶 Swelling of face or hands</div><div class="m-sub">Sudden swelling may indicate a complication.</div></div><div class="m-card" style="border-left:3px solid var(--blue);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:7px;"><div class="m-title" style="color:#0C447C;">🌡️ Fever above 38°C</div><div class="m-sub">Could be malaria or infection. Act now.</div></div><button class="sos-btn" style="margin-top:4px;">🆘 Emergency help now</button></div><div class="ps-nav"><div class="ps-nav-item"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item"><div class="ps-nav-icon">❤️</div><div class="ps-nav-lbl">Health</div></div><div class="ps-nav-item active"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+
+    <!-- Profile / mode switch -->
+    <div><div class="screen-label">Profile &amp; mode switch</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:var(--teal);color:#fff;"><span>9:41</span><span>My Profile</span></div><div class="ps-header" style="background:var(--teal);display:flex;align-items:center;gap:12px;"><div style="width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👤</div><div><div style="color:#fff;font-size:14px;font-weight:700;">Grace Nkosi</div><div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">ID: PAT-00041 · Zomba</div></div></div><div class="ps-body"><div style="font-size:9px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px;">Switch mode</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;"><div style="border:2px solid var(--teal);background:var(--teal-l);border-radius:var(--r-md);padding:9px;text-align:center;"><div style="font-size:18px;margin-bottom:3px;">🤰</div><div style="font-size:10px;font-weight:700;color:var(--teal-d);">Pregnant</div><div style="font-size:8px;color:var(--teal);margin-top:1px;">Active now ✓</div></div><div style="border:2px solid var(--g200);background:var(--g50);border-radius:var(--r-md);padding:9px;text-align:center;cursor:pointer;"><div style="font-size:18px;margin-bottom:3px;">👶</div><div style="font-size:10px;font-weight:700;color:var(--g600);">Postnatal</div><div style="font-size:8px;color:var(--g400);margin-top:1px;">Tap to switch</div></div></div><div class="m-card" style="margin-bottom:8px;"><div class="m-title" style="font-size:11px;">Personal details</div><div style="font-size:10px;color:var(--g600);margin-top:5px;line-height:1.9;"><div>📞 +265 999 000 000</div><div>🏠 Nalisi Village, Zomba</div><div>🩸 Blood group: O+</div><div>👩‍⚕️ Clinician: Agnes Phiri</div></div></div><div class="m-card" style="margin-bottom:8px;"><div class="m-title" style="font-size:11px;">Pregnancy info</div><div style="font-size:10px;color:var(--g600);margin-top:5px;line-height:1.9;"><div>📅 LMP: 25 June 2024</div><div>🎯 EDD: 1 April 2025</div><div>⚕️ G2P1 · ANC visits: 2 done</div></div></div><button class="btn" style="width:100%;justify-content:center;font-size:11px;color:var(--red);border-color:#F7C1C1;">Sign out</button></div><div class="ps-nav"><div class="ps-nav-item"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item"><div class="ps-nav-icon">❤️</div><div class="ps-nav-lbl">Health</div></div><div class="ps-nav-item"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item active"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ POSTNATAL APP ═══════════════════ -->
+<div id="role-postnatal" class="role-screen">
+  <div class="mobile-stage">
+    <!-- Postnatal home -->
+    <div><div class="screen-label">Postnatal home</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:#C2506F;color:#fff;"><span>9:41</span><span>Safe Mother MW</span></div><div class="ps-header" style="background:linear-gradient(135deg,#C2506F,#E8547A);padding-bottom:18px;"><div style="color:rgba(255,255,255,0.75);font-size:10px;">Welcome back,</div><div style="color:#fff;font-size:16px;font-weight:700;margin-top:1px;">Grace Nkosi</div><div style="display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:9px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;">👶 Postnatal · Day 8 after delivery</div></div><div class="ps-body"><div class="baby-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div class="baby-title">👶 Baby Chisomo Nkosi</div><div style="font-size:10px;color:#B8244A;margin-top:2px;">Born 15 Jan 2025 · Female · Day 8</div></div><span class="badge b-low">Healthy</span></div><div class="baby-vitals"><div class="bv"><div class="bv-val">3.2kg</div><div class="bv-lbl">Birth wt</div></div><div class="bv"><div class="bv-val">3.4kg</div><div class="bv-lbl">Now</div></div><div class="bv"><div class="bv-val">37°C</div><div class="bv-lbl">Temp</div></div></div></div><div class="m-card"><div style="font-size:9px;font-weight:700;color:var(--rose);margin-bottom:2px;text-transform:uppercase;">Your recovery — Day 8</div><div class="m-title">Rest and take your iron tablets</div><div class="m-sub">PNC check due in 6 days. Watch for heavy bleeding or fever.</div></div><div class="m-grid2"><div class="m-menu-item"><div class="m-icon-box" style="background:var(--rose-l);">🤱</div><div class="m-item-title">Breastfeeding</div><div class="m-item-sub">Tips &amp; support</div></div><div class="m-menu-item"><div class="m-icon-box" style="background:var(--blue-l);">📅</div><div class="m-item-title">PNC visit</div><div class="m-item-sub">Day 14: Jan 29</div></div><div class="m-menu-item"><div class="m-icon-box" style="background:var(--amber-l);">💊</div><div class="m-item-title">Medications</div><div class="m-item-sub">Iron &amp; folic acid</div></div><div class="m-menu-item"><div class="m-icon-box" style="background:var(--purple-l);">❤️</div><div class="m-item-title">Mood check</div><div class="m-item-sub">How are you?</div></div></div><div class="m-alert" style="border-color:#FAC775;background:var(--amber-l);"><div style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:3px;"></div><div style="font-size:10px;font-weight:700;color:#633806;">Vaccination due in 2 days — bring immunisation card</div></div><button class="sos-btn" style="background:var(--rose);">🆘 Emergency — Call for Help</button></div><div class="ps-nav"><div class="ps-nav-item active" style="background:var(--rose-l);"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl" style="color:#8B1A38;">Home</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👶</div><div class="ps-nav-lbl">Baby</div></div><div class="ps-nav-item"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+
+    <!-- Postnatal health check -->
+    <div><div class="screen-label">Postnatal health check</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:#C2506F;color:#fff;"><span>9:41</span><span>PNC Check</span></div><div class="ps-header" style="background:linear-gradient(135deg,#C2506F,#E8547A);"><div style="color:#fff;font-size:14px;font-weight:700;">Postnatal Check</div><div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">Question 2 of 7</div><div style="background:rgba(255,255,255,0.2);border-radius:3px;height:4px;margin-top:7px;overflow:hidden;"><div style="background:#fff;width:28%;height:100%;border-radius:3px;"></div></div></div><div class="ps-body"><div class="q-card" style="border-color:var(--rose-m);"><div style="font-size:9px;font-weight:700;color:var(--rose);margin-bottom:5px;text-transform:uppercase;">Mother — Bleeding</div><div class="q-text">How is your lochia (discharge) today?</div><div class="q-ans"><button class="q-btn">Light pink</button><button class="q-btn" style="border-color:var(--amber);background:var(--amber-l);color:#633806;">Heavy</button><button class="q-btn no">Normal ✓</button></div></div><div class="q-card" style="border-color:var(--rose-m);"><div style="font-size:9px;font-weight:700;color:var(--rose);margin-bottom:5px;text-transform:uppercase;">Baby — Feeding</div><div class="q-text">Is your baby feeding well today?</div><div class="q-ans"><button class="q-btn no">Yes ✓</button><button class="q-btn yes">No</button></div></div><div class="q-card" style="border-color:var(--rose-m);"><div style="font-size:9px;font-weight:700;color:var(--blue);margin-bottom:5px;text-transform:uppercase;">Mother — Mood</div><div class="q-text">How are you feeling emotionally today?</div><div class="q-ans"><button class="q-btn no">Good</button><button class="q-btn">Okay</button><button class="q-btn yes">Sad / worried</button></div></div><button class="btn btn-rose" style="width:100%;justify-content:center;font-size:11px;margin-top:6px;background:var(--rose);color:#fff;border-color:var(--rose);">Continue →</button></div><div class="ps-nav"><div class="ps-nav-item"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item active" style="background:var(--rose-l);"><div class="ps-nav-icon">❤️</div><div class="ps-nav-lbl" style="color:#8B1A38;">Health</div></div><div class="ps-nav-item"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+
+    <!-- Baby tracker -->
+    <div><div class="screen-label">Baby tracker</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:#C2506F;color:#fff;"><span>9:41</span><span>Baby Tracker</span></div><div class="ps-header" style="background:linear-gradient(135deg,#C2506F,#E8547A);"><div style="color:#fff;font-size:14px;font-weight:700;">Baby Chisomo</div><div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">Day 8 · Born 15 Jan 2025 · Female</div></div><div class="ps-body"><div class="baby-card"><div class="baby-title" style="margin-bottom:8px;">📊 Growth record</div><div class="baby-vitals"><div class="bv"><div class="bv-val">3.2</div><div class="bv-lbl">Birth (kg)</div></div><div class="bv"><div class="bv-val">3.4</div><div class="bv-lbl">Day 8 (kg)</div></div><div class="bv"><div class="bv-val">48cm</div><div class="bv-lbl">Length</div></div></div></div><div class="m-card"><div style="font-size:9px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:6px;">Vaccination schedule</div><div style="font-size:10px;color:var(--g600);line-height:1.9;"><div>✅ BCG — at birth (done)</div><div>✅ OPV 0 — at birth (done)</div><div style="color:#633806;font-weight:600;">⏰ OPV 1 + Penta 1 — Due 17 Jan</div><div style="color:var(--g400);">⏳ OPV 2 + Penta 2 — Wk 10</div><div style="color:var(--g400);">⏳ OPV 3 + Penta 3 — Wk 14</div></div></div><div class="m-card"><div style="font-size:9px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:5px;">Feeding log</div><div style="font-size:10px;color:var(--teal-d);font-weight:600;">✅ Exclusive breastfeeding — 8 times today</div><div style="font-size:10px;color:var(--g400);margin-top:2px;">Last fed: 1 hr ago · Next: ~2 hrs</div></div><button style="width:100%;background:var(--rose);color:#fff;border:none;border-radius:var(--r-md);padding:11px;font-size:11px;font-weight:700;font-family:var(--sans);cursor:pointer;">Log feeding / nappy →</button></div><div class="ps-nav"><div class="ps-nav-item"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item active" style="background:var(--rose-l);"><div class="ps-nav-icon">👶</div><div class="ps-nav-lbl" style="color:#8B1A38;">Baby</div></div><div class="ps-nav-item"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+
+    <!-- Postnatal danger signs -->
+    <div><div class="screen-label">Postnatal danger signs</div><div class="phone-shell"><div class="phone-pill"></div><div class="phone-inner"><div class="ps-bar" style="background:#C2506F;color:#fff;"><span>9:41</span><span>Danger Signs</span></div><div class="ps-header" style="background:linear-gradient(135deg,#C2506F,#E8547A);"><div style="color:#fff;font-size:14px;font-weight:700;">Postnatal Danger Signs</div><div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:2px;">For you and your baby — go to clinic immediately</div></div><div class="ps-body"><div style="font-size:9px;font-weight:700;color:var(--rose);text-transform:uppercase;margin-bottom:7px;">For the mother:</div><div class="m-card" style="border-left:3px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:6px;"><div class="m-title" style="color:#791F1F;">🩸 Heavy or foul-smelling bleeding</div><div class="m-sub">More than 1 pad per hour is serious.</div></div><div class="m-card" style="border-left:3px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:6px;"><div class="m-title" style="color:#791F1F;">🌡️ Fever above 38°C</div><div class="m-sub">Could be infection. Do not wait — seek care.</div></div><div class="m-card" style="border-left:3px solid var(--amber);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:8px;"><div class="m-title" style="color:#633806;">😢 Extreme sadness or confusion</div><div class="m-sub">Postnatal depression is real. Tell your clinician.</div></div><div style="font-size:9px;font-weight:700;color:var(--rose);text-transform:uppercase;margin-bottom:7px;">For the baby:</div><div class="m-card" style="border-left:3px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:6px;"><div class="m-title" style="color:#791F1F;">🤧 Not feeding / very weak</div><div class="m-sub">A baby refusing to feed needs urgent attention.</div></div><div class="m-card" style="border-left:3px solid var(--red);border-radius:0 var(--r-md) var(--r-md) 0;margin-bottom:6px;"><div class="m-title" style="color:#791F1F;">🌡️ Temp &lt; 36°C or &gt; 38°C</div><div class="m-sub">Temperature outside this range is an emergency.</div></div><button class="sos-btn" style="background:var(--rose);">🆘 Emergency — Call for Help</button></div><div class="ps-nav"><div class="ps-nav-item"><div class="ps-nav-icon">🏠</div><div class="ps-nav-lbl">Home</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👶</div><div class="ps-nav-lbl">Baby</div></div><div class="ps-nav-item active" style="background:var(--rose-l);"><div class="ps-nav-icon">📖</div><div class="ps-nav-lbl" style="color:#8B1A38;">Learn</div></div><div class="ps-nav-item"><div class="ps-nav-icon">👤</div><div class="ps-nav-lbl">Profile</div></div></div></div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CLINICIAN ═══════════════════ -->
+<div id="role-clinician" class="role-screen">
+  <div class="web-stage">
+    <div class="sidebar">
+      <div class="sb-logo"><div class="sb-logo-text">Safe Mother <em>MW</em></div><div class="sb-logo-sub">Clinician portal</div></div>
+      <div class="sb-section">
+        <div class="sb-label">Overview</div>
+        <div class="sb-item active" onclick="switchPage('clinician','cl-dash',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity="0.4"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1.5" fill="currentColor"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity="0.4"/></svg>Dashboard
+        </div>
+        <div class="sb-item" onclick="switchPage('clinician','cl-patients',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="3" stroke="currentColor" stroke-width="1.2"/><path d="M2 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.2"/></svg>My Patients<span class="sb-badge">38</span>
+        </div>
+        <div class="sb-item" onclick="switchPage('clinician','cl-alerts',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5A4 4 0 0111.5 5.5v3l1.5 2H2L3.5 8.5V5.5A4 4 0 017.5 1.5z" stroke="currentColor" stroke-width="1.2"/><path d="M6 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>Alerts<span class="sb-badge">3</span>
+        </div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">
+        <div class="sb-label">Clinical</div>
+        <div class="sb-item" onclick="switchPage('clinician','cl-register',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="1.5" width="11" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5h5M5 8h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Register Patient
+        </div>
+        <div class="sb-item" onclick="switchPage('clinician','cl-consult',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 2v11M2 7.5h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>New Consultation
+        </div>
+        <div class="sb-item" onclick="switchPage('clinician','cl-postnatal',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 13c0-2 1.6-3.5 3.5-3.5S11 11 11 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Postnatal Visits<span class="sb-badge-rose">5</span>
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-avatar" style="background:var(--teal-l);color:var(--teal-d);">AP</div>
+        <div><div class="sb-name">Agnes Phiri</div><div class="sb-role">Clinician · Zomba Central</div></div>
+      </div>
+    </div>
+    <div class="main-area">
+      <!-- Dashboard -->
+      <div id="cl-dash" class="page active">
+        <div class="ph"><div><div class="ph-title">Dashboard</div><div class="ph-sub">Thursday, 23 January 2025 · Zomba Central Health Centre</div></div><div class="ph-actions"><button class="btn">Filter</button><button class="btn btn-teal">+ New Patient</button></div></div>
+        <div class="metrics" style="grid-template-columns:repeat(5,minmax(0,1fr));">
+          <div class="metric"><div class="metric-lbl">Active patients</div><div class="metric-val">38</div><div class="metric-sub">This week</div></div>
+          <div class="metric"><div class="metric-lbl">Pregnant</div><div class="metric-val" style="color:var(--teal);">33</div><div class="metric-sub">ANC active</div></div>
+          <div class="metric"><div class="metric-lbl">Postnatal</div><div class="metric-val" style="color:var(--rose);">5</div><div class="metric-sub">PNC active</div></div>
+          <div class="metric"><div class="metric-lbl">High risk</div><div class="metric-val" style="color:var(--red);">6</div><div class="metric-sub">↑ 2 this week</div></div>
+          <div class="metric"><div class="metric-lbl">Alerts</div><div class="metric-val" style="color:var(--amber);">3</div><div class="metric-sub">Unread</div></div>
+        </div>
+        <div class="main-side">
+          <div class="card">
+            <div class="sh"><div class="sh-title">Patient queue</div><div style="display:flex;gap:6px;"><span class="badge b-low" style="cursor:pointer;">Pregnant</span><span class="badge b-rose" style="cursor:pointer;">Postnatal</span><span class="badge" style="background:var(--g100);color:var(--g600);cursor:pointer;">All</span></div></div>
+            <table class="dt"><thead><tr><th>Patient</th><th>Type</th><th>Weeks/Days</th><th>Concern</th><th>Risk</th><th></th></tr></thead><tbody>
+              <tr><td><div style="font-weight:700;font-size:12px;">Grace Nkosi</div><div style="font-size:10px;color:var(--g400);">G2P1 · 28 yrs</div></td><td><span class="badge b-low">Pregnant</span></td><td>Wk 28</td><td style="font-size:11px;">BP elevated, reduced FM</td><td><span class="badge b-high">High</span></td><td><button class="btn btn-sm btn-red">Review</button></td></tr>
+              <tr><td><div style="font-weight:700;font-size:12px;">Faith Mwale</div><div style="font-size:10px;color:var(--g400);">G1P0 · 22 yrs</div></td><td><span class="badge b-low">Pregnant</span></td><td>Wk 34</td><td style="font-size:11px;">Oedema, proteinuria</td><td><span class="badge b-high">High</span></td><td><button class="btn btn-sm btn-red">Review</button></td></tr>
+              <tr><td><div style="font-weight:700;font-size:12px;">Mercy Tembo</div><div style="font-size:10px;color:var(--g400);">G1P1 · 26 yrs</div></td><td><span class="badge b-rose">Postnatal</span></td><td>Day 8</td><td style="font-size:11px;">Mild fever, PNC due</td><td><span class="badge b-med">Medium</span></td><td><button class="btn btn-sm">Review</button></td></tr>
+              <tr><td><div style="font-weight:700;font-size:12px;">Liness Kachali</div><div style="font-size:10px;color:var(--g400);">G3P2 · 31 yrs</div></td><td><span class="badge b-low">Pregnant</span></td><td>Wk 30</td><td style="font-size:11px;">Gestational diabetes</td><td><span class="badge b-med">Medium</span></td><td><button class="btn btn-sm">Review</button></td></tr>
+              <tr><td><div style="font-weight:700;font-size:12px;">Rose Phiri</div><div style="font-size:10px;color:var(--g400);">G2P2 · 24 yrs</div></td><td><span class="badge b-rose">Postnatal</span></td><td>Day 14</td><td style="font-size:11px;">PNC day 14 — routine</td><td><span class="badge b-low">Low</span></td><td><button class="btn btn-sm">Review</button></td></tr>
+            </tbody></table>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:10px;">
+              <div class="sh-title" style="margin-bottom:10px;">Today's schedule</div>
+              <div class="timeline">
+                <div class="tl-item"><div class="tl-dot" style="background:var(--teal);"></div><div class="tl-t">Grace Nkosi — ANC check</div><div class="tl-s">10:00am · Done</div></div>
+                <div class="tl-item"><div class="tl-dot" style="background:var(--rose);"></div><div class="tl-t">Mercy Tembo — PNC day 8</div><div class="tl-s">11:30am · Pending</div></div>
+                <div class="tl-item"><div class="tl-dot" style="background:var(--amber);"></div><div class="tl-t">Faith Mwale — ANC visit</div><div class="tl-s">2:00pm · Upcoming</div></div>
+                <div class="tl-item" style="margin:0;"><div class="tl-dot" style="background:var(--g200);"></div><div class="tl-t">Rose Phiri — PNC day 14</div><div class="tl-s">3:30pm · Upcoming</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="sh-title" style="margin-bottom:10px;">Active alerts</div>
+              <div class="al crit"><div class="al-dot" style="background:var(--red);"></div><div><div class="al-title" style="color:#791F1F;">Grace Nkosi — BP 148/96</div><div class="al-sub" style="color:var(--red);">Reduced fetal movement. Review now.</div></div><div class="al-time">12 min</div></div>
+              <div class="al warn" style="margin-bottom:0;"><div class="al-dot" style="background:var(--amber);"></div><div><div class="al-title" style="color:#633806;">Mercy Tembo — fever 37.9°C</div><div class="al-sub" style="color:var(--amber);">Postnatal day 8. Review today.</div></div><div class="al-time">1h</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Patients page -->
+      <div id="cl-patients" class="page">
+        <div class="ph"><div><div class="ph-title">My Patients</div><div class="ph-sub">38 active — 33 pregnant, 5 postnatal</div></div><div class="ph-actions"><input type="text" class="fi" placeholder="Search..." style="width:180px;"><select class="fs" style="width:130px;"><option>All patients</option><option>Pregnant</option><option>Postnatal</option><option>High risk</option></select><button class="btn btn-teal">+ Register</button></div></div>
+        <div class="card"><table class="dt"><thead><tr><th>Patient</th><th>Type</th><th>Age</th><th>Gestation/PNC</th><th>Last visit</th><th>BP</th><th>Risk score</th><th>Risk</th><th></th></tr></thead><tbody>
+          <tr><td><div style="font-weight:700;font-size:12px;">Grace Nkosi</div><div style="font-size:10px;color:var(--g400);">G2P1 · 0041</div></td><td><span class="badge b-low">Pregnant</span></td><td>28</td><td>Wk 28</td><td>Today</td><td style="color:var(--red);font-weight:700;">148/96</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="rbar-wrap" style="width:50px;"><div class="rbar-fill" style="width:74%;background:var(--red);"></div></div><span style="font-size:10px;font-weight:700;color:var(--red);">74</span></div></td><td><span class="badge b-high">High</span></td><td><button class="btn btn-sm">Open</button></td></tr>
+          <tr><td><div style="font-weight:700;font-size:12px;">Faith Mwale</div><div style="font-size:10px;color:var(--g400);">G1P0 · 0038</div></td><td><span class="badge b-low">Pregnant</span></td><td>22</td><td>Wk 34</td><td>3 days</td><td style="color:var(--amber);font-weight:700;">132/88</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="rbar-wrap" style="width:50px;"><div class="rbar-fill" style="width:62%;background:var(--amber);"></div></div><span style="font-size:10px;font-weight:700;color:var(--amber);">62</span></div></td><td><span class="badge b-high">High</span></td><td><button class="btn btn-sm">Open</button></td></tr>
+          <tr><td><div style="font-weight:700;font-size:12px;">Mercy Tembo</div><div style="font-size:10px;color:var(--g400);">G1P1 · 0044</div></td><td><span class="badge b-rose">Postnatal</span></td><td>26</td><td>PNC Day 8</td><td>Today</td><td>120/78</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="rbar-wrap" style="width:50px;"><div class="rbar-fill" style="width:45%;background:var(--amber);"></div></div><span style="font-size:10px;font-weight:700;color:var(--amber);">45</span></div></td><td><span class="badge b-med">Medium</span></td><td><button class="btn btn-sm">Open</button></td></tr>
+          <tr><td><div style="font-weight:700;font-size:12px;">Patience Banda</div><div style="font-size:10px;color:var(--g400);">G1P0 · 0029</div></td><td><span class="badge b-low">Pregnant</span></td><td>19</td><td>Wk 22</td><td>2 weeks</td><td>110/70</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="rbar-wrap" style="width:50px;"><div class="rbar-fill" style="width:22%;background:var(--teal);"></div></div><span style="font-size:10px;font-weight:700;color:var(--teal);">22</span></div></td><td><span class="badge b-low">Low</span></td><td><button class="btn btn-sm">Open</button></td></tr>
+        </tbody></table></div>
+      </div>
+      <!-- ANC Consultation -->
+      <div id="cl-consult" class="page">
+        <div class="ph"><div><div class="ph-title">ANC Consultation — Grace Nkosi</div><div class="ph-sub">G2P1 · 28 yrs · Week 28 · ID: 0041 · Zomba Zone 4</div></div><div class="ph-actions"><button class="btn">Print</button><button class="btn btn-red">Escalate</button><button class="btn btn-teal">Save</button></div></div>
+        <div class="two-col">
+          <div>
+            <div class="card" style="margin-bottom:10px;">
+              <div class="card-title">Vitals</div>
+              <div class="vitals" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+                <div class="v-card"><div class="v-name">Blood pressure</div><div class="v-val" style="color:var(--red);">148/96</div><div class="v-unit">mmHg</div><span class="v-status" style="background:var(--red-l);color:#791F1F;">Elevated</span></div>
+                <div class="v-card"><div class="v-name">Temperature</div><div class="v-val">37.1</div><div class="v-unit">°C</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div>
+                <div class="v-card"><div class="v-name">Fetal HR</div><div class="v-val">138</div><div class="v-unit">bpm</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div>
+                <div class="v-card"><div class="v-name">Haemoglobin</div><div class="v-val" style="color:var(--amber);">9.2</div><div class="v-unit">g/dL</div><span class="v-status" style="background:var(--amber-l);color:#633806;">Low</span></div>
+                <div class="v-card"><div class="v-name">Weight</div><div class="v-val">64</div><div class="v-unit">kg</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div>
+                <div class="v-card"><div class="v-name">Urine protein</div><div class="v-val" style="color:var(--amber);">+1</div><div class="v-unit">dipstick</div><span class="v-status" style="background:var(--amber-l);color:#633806;">Trace</span></div>
+                <div class="v-card"><div class="v-name">Fundal ht</div><div class="v-val">27</div><div class="v-unit">cm</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div>
+                <div class="v-card"><div class="v-name">MUAC</div><div class="v-val">23</div><div class="v-unit">cm</div><span class="v-status" style="background:var(--amber-l);color:#633806;">Border</span></div>
+              </div>
+            </div>
+            <div class="card"><div class="card-title">Clinical notes</div><div class="fg"><label class="fl">Chief complaint</label><input class="fi" value="Headache since morning, reduced fetal movement"></div><div class="fg"><label class="fl">Findings</label><textarea class="fi" rows="2" style="resize:none;">BP elevated on two readings. Oedema 1+. FHR 138bpm. Reduced FM reported.</textarea></div><div class="fr"><div class="fg"><label class="fl">Diagnosis</label><select class="fs"><option>Pre-eclampsia — mild</option></select></div><div class="fg"><label class="fl">Plan</label><select class="fs"><option>Refer to hospital</option><option>Monitor closely</option></select></div></div><div class="fg"><label class="fl">Treatment</label><input class="fi" value="Ferrous sulphate 200mg BD · Folic acid · Methyldopa 250mg TDS"></div><div class="fg"><label class="fl">Next ANC</label><input class="fi" type="date" value="2025-01-31"></div></div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:10px;"><div class="card-title">Risk score</div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;"><span style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--red);">74</span><span class="badge b-high" style="font-size:12px;padding:4px 12px;">High Risk</span></div><div class="rbar-wrap" style="height:8px;margin-bottom:10px;"><div class="rbar-fill" style="width:74%;background:var(--red);"></div></div><div style="font-size:10px;color:var(--g600);line-height:1.8;"><div>● Elevated BP (+25)</div><div>● Reduced fetal movement (+20)</div><div>● Anaemia Hb &lt;10 (+15)</div><div>● Trace proteinuria (+10)</div><div>● MUAC borderline (+4)</div></div><div class="al crit" style="margin-top:10px;"><div class="al-dot" style="background:var(--red);"></div><div class="al-title" style="color:#791F1F;">Recommend hospital referral</div></div></div>
+            <div class="card" style="margin-bottom:10px;"><div class="card-title">History</div><div class="timeline"><div class="tl-item"><div class="tl-dot" style="background:var(--red);"></div><div class="tl-t">Today — High risk flagged</div><div class="tl-s">BP 148/96 · reduced FM</div></div><div class="tl-item"><div class="tl-dot" style="background:var(--amber);"></div><div class="tl-t">Wk 24 — ANC visit 2</div><div class="tl-s">BP 128/84 · Hb 9.8</div></div><div class="tl-item" style="margin:0;"><div class="tl-dot" style="background:var(--teal);"></div><div class="tl-t">Wk 16 — ANC visit 1</div><div class="tl-s">BP 110/70 · Normal</div></div></div></div>
+            <div class="card"><div class="card-title">Referral</div><div class="fg"><label class="fl">Refer to</label><select class="fs"><option>Zomba Central Hospital</option><option>QECH Blantyre</option></select></div><div class="fg"><label class="fl">Reason</label><textarea class="fi" rows="2" style="resize:none;">Suspected mild pre-eclampsia with anaemia. Obstetric review needed.</textarea></div><button class="btn btn-red" style="width:100%;justify-content:center;">Send referral now →</button></div>
+          </div>
+        </div>
+      </div>
+      <!-- Register patient -->
+      <div id="cl-register" class="page">
+        <div class="ph"><div><div class="ph-title">Register New Patient</div><div class="ph-sub">Create a new maternal health record</div></div><div class="ph-actions"><button class="btn">Cancel</button><button class="btn btn-teal">Save & continue →</button></div></div>
+        <div class="two-col">
+          <div class="card"><div class="card-title">Personal information</div><div class="fr"><div class="fg"><label class="fl">First name</label><input class="fi" placeholder="e.g. Grace"></div><div class="fg"><label class="fl">Surname</label><input class="fi" placeholder="e.g. Nkosi"></div></div><div class="fr"><div class="fg"><label class="fl">Date of birth</label><input class="fi" type="date"></div><div class="fg"><label class="fl">Phone number</label><input class="fi" placeholder="+265 999 000 000"></div></div><div class="fr"><div class="fg"><label class="fl">District</label><select class="fs"><option>Zomba</option><option>Blantyre</option></select></div><div class="fg"><label class="fl">Village / TA</label><input class="fi" placeholder="e.g. Nalisi"></div></div><div class="fg"><label class="fl">National ID</label><input class="fi" placeholder="e.g. 8301-25-1234567-5"></div><div class="fg"><label class="fl">Next of kin &amp; phone</label><input class="fi" placeholder="Name · +265 881 123 456"></div></div>
+          <div class="card"><div class="card-title">Registration type</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;"><div style="border:2px solid var(--teal);background:var(--teal-l);border-radius:var(--r-md);padding:12px;cursor:pointer;text-align:center;"><div style="font-size:20px;margin-bottom:4px;">🤰</div><div style="font-size:11px;font-weight:700;color:var(--teal-d);">Pregnant mother</div><div style="font-size:9px;color:var(--teal);margin-top:2px;">ANC registration</div></div><div style="border:2px solid var(--g200);background:var(--g50);border-radius:var(--r-md);padding:12px;cursor:pointer;text-align:center;"><div style="font-size:20px;margin-bottom:4px;">👶</div><div style="font-size:11px;font-weight:700;color:var(--g600);">Postnatal mother</div><div style="font-size:9px;color:var(--g400);margin-top:2px;">PNC registration</div></div></div><div class="card-title">Obstetric history</div><div class="fr"><div class="fg"><label class="fl">Gravida</label><input class="fi" type="number" placeholder="No. of pregnancies"></div><div class="fg"><label class="fl">Para</label><input class="fi" type="number" placeholder="No. of births"></div></div><div class="fr"><div class="fg"><label class="fl">LMP date</label><input class="fi" type="date"></div><div class="fg"><label class="fl">EDD</label><input class="fi" placeholder="Auto-calculated" readonly></div></div><div class="fg"><label class="fl">Blood group</label><select class="fs"><option>O+</option><option>A+</option><option>B+</option><option>AB+</option><option>Unknown</option></select></div><div class="info-pill">ℹ SMS appointment reminder sent automatically on registration.</div></div>
+        </div>
+      </div>
+      <!-- Postnatal visit -->
+      <div id="cl-postnatal" class="page">
+        <div class="ph"><div><div class="ph-title">PNC Visit — Mercy Tembo</div><div class="ph-sub">G1P1 · 26 yrs · PNC Day 8 · Baby: Chisomo (Day 8)</div></div><div class="ph-actions"><button class="btn">Print</button><button class="btn btn-teal">Save PNC record</button></div></div>
+        <div class="two-col">
+          <div><div class="card" style="margin-bottom:10px;"><div class="card-title">Mother vitals — Day 8</div><div class="vitals" style="grid-template-columns:repeat(3,minmax(0,1fr));"><div class="v-card"><div class="v-name">Blood pressure</div><div class="v-val">120/78</div><div class="v-unit">mmHg</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div><div class="v-card"><div class="v-name">Temperature</div><div class="v-val" style="color:var(--amber);">37.9</div><div class="v-unit">°C</div><span class="v-status" style="background:var(--amber-l);color:#633806;">Mild fever</span></div><div class="v-card"><div class="v-name">Haemoglobin</div><div class="v-val">10.1</div><div class="v-unit">g/dL</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Acceptable</span></div><div class="v-card"><div class="v-name">Lochia</div><div class="v-val" style="font-size:13px;">Normal</div><div class="v-unit">pinkish</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">OK</span></div><div class="v-card"><div class="v-name">Breastfeeding</div><div class="v-val" style="font-size:13px;">Yes</div><div class="v-unit">exclusive</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Good</span></div><div class="v-card"><div class="v-name">Perineum</div><div class="v-val" style="font-size:13px;">Healing</div><div class="v-unit">stitches</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div></div></div><div class="card"><div class="card-title">Clinical notes — mother</div><div class="fg"><label class="fl">Complaints</label><input class="fi" value="Mild fever since yesterday, breast engorgement"></div><div class="fg"><label class="fl">Assessment</label><textarea class="fi" rows="2" style="resize:none;">Mild pyrexia from breast engorgement. No endometritis signs. Wound healing well.</textarea></div><div class="fg"><label class="fl">Treatment</label><input class="fi" value="Paracetamol 1g TDS · Ferrous sulphate · Encourage frequent feeding"></div><div class="fg"><label class="fl">Next PNC visit</label><input class="fi" type="date" value="2025-01-29"></div></div></div>
+          <div><div class="card" style="margin-bottom:10px;border:1px solid var(--rose-m);"><div class="card-title" style="color:#8B1A38;">👶 Neonate — Baby Chisomo</div><div class="vitals" style="grid-template-columns:repeat(2,minmax(0,1fr));"><div class="v-card"><div class="v-name">Weight</div><div class="v-val">3.4</div><div class="v-unit">kg (↑ from 3.2)</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal gain</span></div><div class="v-card"><div class="v-name">Temperature</div><div class="v-val">36.8</div><div class="v-unit">°C</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div><div class="v-card"><div class="v-name">Umbilicus</div><div class="v-val" style="font-size:13px;">Drying</div><div class="v-unit">no redness</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Normal</span></div><div class="v-card"><div class="v-name">Jaundice</div><div class="v-val" style="font-size:13px;">None</div><div class="v-unit">skin/eyes</div><span class="v-status" style="background:var(--teal-l);color:var(--teal-d);">Clear</span></div></div><div class="fg" style="margin-top:10px;margin-bottom:0;"><label class="fl">Vaccination status</label><div style="font-size:11px;color:var(--g600);line-height:1.8;background:var(--g50);border-radius:var(--r-sm);padding:8px;border:1px solid var(--g100);">✅ BCG — done at birth<br>✅ OPV 0 — done at birth<br><span style="color:#633806;font-weight:600;">⏰ OPV 1 + Penta 1 — due tomorrow</span></div></div></div><div class="card"><div class="card-title">PNC risk score</div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;"><span style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--amber);">45</span><span class="badge b-med" style="font-size:11px;padding:4px 12px;">Medium Risk</span></div><div class="rbar-wrap" style="height:7px;margin-bottom:10px;"><div class="rbar-fill" style="width:45%;background:var(--amber);"></div></div><div style="font-size:10px;color:var(--g600);line-height:1.8;"><div>● Mild fever (+20 pts)</div><div>● Breast engorgement (+15 pts)</div><div>● Vaccination overdue (+10 pts)</div></div></div></div>
+        </div>
+      </div>
+      <!-- Alerts -->
+      <div id="cl-alerts" class="page">
+        <div class="ph"><div><div class="ph-title">Alerts</div><div class="ph-sub">3 unread alerts requiring your attention</div></div><div class="ph-actions"><button class="btn">Mark all read</button></div></div>
+        <div class="card">
+          <div class="ni unread"><div class="ni-icon" style="background:var(--red-l);">🚨</div><div><div class="ni-title">Emergency — Grace Nkosi (Wk 28)</div><div class="ni-sub">Patient triggered SOS via app. BP 148/96, reduced fetal movement. Immediate review required.</div></div><div class="ni-time">12 min</div></div>
+          <div class="ni unread"><div class="ni-icon" style="background:var(--amber-l);">⚠️</div><div><div class="ni-title">Fever — Mercy Tembo (PNC Day 8)</div><div class="ni-sub">IVR check flagged fever 37.9°C. Review during today's PNC visit.</div></div><div class="ni-time">1 hr</div></div>
+          <div class="ni unread"><div class="ni-icon" style="background:var(--amber-l);">⏰</div><div><div class="ni-title">Vaccination due — Baby Chisomo</div><div class="ni-sub">OPV 1 + Penta 1 due tomorrow. Remind mother at visit.</div></div><div class="ni-time">Today</div></div>
+          <div class="ni"><div class="ni-icon" style="background:var(--teal-l);">✅</div><div><div class="ni-title">Referral completed — Faith Mwale</div><div class="ni-sub">Admitted at Zomba Central. Status: stable. Ward 6B.</div></div><div class="ni-time">Yesterday</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DHO / ADMIN ═══════════════════ -->
+<div id="role-dho" class="role-screen">
+  <div class="web-stage">
+    <div class="sidebar">
+      <div class="sb-logo"><div class="sb-logo-text">Safe Mother <em>MW</em></div><div class="sb-logo-sub">DHO / Admin portal</div></div>
+      <div class="sb-section">
+        <div class="sb-label">Analytics</div>
+        <div class="sb-item active" onclick="switchPage('dho','dho-overview',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity="0.4"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1.5" fill="currentColor"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity="0.4"/></svg>District Overview
+        </div>
+        <div class="sb-item" onclick="switchPage('dho','dho-anc',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 2v2M10 2v2M2 6.5h11" stroke="currentColor" stroke-width="1.2"/></svg>ANC &amp; PNC Attendance
+        </div>
+        <div class="sb-item" onclick="switchPage('dho','dho-heatmap',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 4v3.5l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Risk Heatmap
+        </div>
+        <div class="sb-item" onclick="switchPage('dho','dho-alerts',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5A4 4 0 0111.5 5.5v3l1.5 2H2L3.5 8.5V5.5A4 4 0 017.5 1.5z" stroke="currentColor" stroke-width="1.2"/><path d="M6 12.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>Alerts &amp; Escalations<span class="sb-badge">5</span>
+        </div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">
+        <div class="sb-label">Management</div>
+        <div class="sb-item" onclick="switchPage('dho','dho-reports',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="1.5" width="11" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5h5M5 8h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Reports
+        </div>
+        <div class="sb-item" onclick="switchPage('dho','dho-admin',this)">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 1v2M7.5 12v2M1 7.5h2M12 7.5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>System Admin
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-avatar" style="background:var(--blue-l);color:#0C447C;">DM</div>
+        <div><div class="sb-name">Dr. D. Msiska</div><div class="sb-role">DHO · Zomba District</div></div>
+      </div>
+    </div>
+    <div class="main-area">
+      <!-- DHO Overview -->
+      <div id="dho-overview" class="page active">
+        <div class="ph"><div><div class="ph-title">Zomba District Overview</div><div class="ph-sub">Week 3, January 2025 · Live · 7 health zones</div></div><div class="ph-actions"><button class="btn">Export CSV</button><button class="btn btn-teal">Generate report</button></div></div>
+        <div class="metrics" style="grid-template-columns:repeat(6,minmax(0,1fr));">
+          <div class="metric"><div class="metric-lbl">Registered</div><div class="metric-val">1,284</div><div class="metric-sub">All mothers</div></div>
+          <div class="metric"><div class="metric-lbl">Pregnant</div><div class="metric-val" style="color:var(--teal);">1,036</div><div class="metric-sub">ANC active</div></div>
+          <div class="metric"><div class="metric-lbl">Postnatal</div><div class="metric-val" style="color:var(--rose);">248</div><div class="metric-sub">PNC active</div></div>
+          <div class="metric"><div class="metric-lbl">ANC rate</div><div class="metric-val" style="color:var(--amber);">76%</div><div class="metric-sub">Target: 85%</div></div>
+          <div class="metric"><div class="metric-lbl">High-risk</div><div class="metric-val" style="color:var(--red);">89</div><div class="metric-sub">↑ 12 this week</div></div>
+          <div class="metric"><div class="metric-lbl">IVR calls</div><div class="metric-val">342</div><div class="metric-sub">This week</div></div>
+        </div>
+        <div class="main-side">
+          <div class="card">
+            <div class="sh"><div class="sh-title">ANC attendance by zone — January</div></div>
+            <div class="barchart" style="height:100px;margin-bottom:6px;">
+              <div class="bc-col"><div class="bc-val">82%</div><div class="bc-bar" style="height:82px;background:var(--teal);"></div><div class="bc-lbl">Z1</div></div>
+              <div class="bc-col"><div class="bc-val">67%</div><div class="bc-bar" style="height:67px;background:var(--amber);"></div><div class="bc-lbl">Z2</div></div>
+              <div class="bc-col"><div class="bc-val">91%</div><div class="bc-bar" style="height:91px;background:var(--teal);"></div><div class="bc-lbl">Z3</div></div>
+              <div class="bc-col"><div class="bc-val" style="color:var(--red);">48%</div><div class="bc-bar" style="height:48px;background:var(--red);"></div><div class="bc-lbl" style="color:var(--red);">Z4</div></div>
+              <div class="bc-col"><div class="bc-val">73%</div><div class="bc-bar" style="height:73px;background:var(--teal-m);"></div><div class="bc-lbl">Z5</div></div>
+              <div class="bc-col"><div class="bc-val">85%</div><div class="bc-bar" style="height:85px;background:var(--teal);"></div><div class="bc-lbl">Z6</div></div>
+              <div class="bc-col"><div class="bc-val">60%</div><div class="bc-bar" style="height:60px;background:var(--amber);"></div><div class="bc-lbl">Z7</div></div>
+            </div>
+            <div style="display:flex;gap:14px;"><div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--g400);"><div style="width:9px;height:9px;border-radius:2px;background:var(--teal);"></div>On target (≥80%)</div><div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--g400);"><div style="width:9px;height:9px;border-radius:2px;background:var(--amber);"></div>Below</div><div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--g400);"><div style="width:9px;height:9px;border-radius:2px;background:var(--red);"></div>Critical</div></div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:10px;">
+              <div class="sh-title" style="margin-bottom:10px;">Risk split</div>
+              <svg viewBox="0 0 100 100" width="88" height="88" style="display:block;margin:0 auto 10px;">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#9FE1CB" stroke-width="15"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#FAC775" stroke-width="15" stroke-dasharray="49 239" stroke-dashoffset="-143"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#E24B4A" stroke-width="15" stroke-dasharray="26 239" stroke-dashoffset="-94"/>
+              </svg>
+              <div style="font-size:10px;">
+                <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--g100);"><span style="color:var(--teal);">● Low</span><span style="font-weight:700;">680 (53%)</span></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--g100);"><span style="color:var(--amber);">● Medium</span><span style="font-weight:700;">315 (25%)</span></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 0;"><span style="color:var(--red);">● High</span><span style="font-weight:700;">89 (7%)</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="sh-title" style="margin-bottom:8px;">Key insights</div>
+              <div style="font-size:10px;color:var(--g600);line-height:1.9;">
+                <div>⚠ Zone 4 critically low ANC (48%)</div>
+                <div>↑ High-risk cases up 16% vs last month</div>
+                <div>✓ Zone 3 exceeds target (91%)</div>
+                <div>👶 248 postnatal mothers tracked</div>
+                <div>🔔 28 IVR calls flagged urgent</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="three-col">
+          <div class="card"><div class="card-title">Zone performance</div><table class="dt"><thead><tr><th>Zone</th><th>ANC</th><th>PNC</th><th>High-risk</th></tr></thead><tbody><tr><td style="color:var(--red);font-weight:700;">Zone 4</td><td style="color:var(--red);font-weight:700;">48%</td><td>57%</td><td><span class="badge b-high">31</span></td></tr><tr><td>Zone 2</td><td>67%</td><td>70%</td><td><span class="badge b-med">18</span></td></tr><tr><td>Zone 7</td><td>60%</td><td>66%</td><td><span class="badge b-med">14</span></td></tr><tr><td>Zone 3</td><td>91%</td><td>93%</td><td><span class="badge b-low">6</span></td></tr></tbody></table></div>
+          <div class="card"><div class="card-title">Clinician workload</div><table class="dt"><thead><tr><th>Clinician</th><th>ANC</th><th>PNC</th><th>High risk</th></tr></thead><tbody><tr><td>Agnes Phiri</td><td>33</td><td>5</td><td><span class="badge b-high">6</span></td></tr><tr><td>James Mwenye</td><td>37</td><td>5</td><td><span class="badge b-high">8</span></td></tr><tr><td>Rose Banda</td><td>25</td><td>4</td><td><span class="badge b-med">3</span></td></tr><tr><td>Peter Chirwa</td><td>31</td><td>3</td><td><span class="badge b-med">4</span></td></tr></tbody></table></div>
+          <div class="card"><div class="card-title">Recent activity</div><div class="timeline"><div class="tl-item"><div class="tl-dot" style="background:var(--red);"></div><div class="tl-t" style="font-size:10px;">Emergency — Zone 4</div><div class="tl-s">12 min ago</div></div><div class="tl-item"><div class="tl-dot" style="background:var(--rose);"></div><div class="tl-t" style="font-size:10px;">PNC visit — Mercy Tembo</div><div class="tl-s">1 hr ago</div></div><div class="tl-item"><div class="tl-dot" style="background:var(--amber);"></div><div class="tl-t" style="font-size:10px;">3 ANC missed — Zone 7</div><div class="tl-s">2 hrs ago</div></div><div class="tl-item" style="margin:0;"><div class="tl-dot" style="background:var(--blue);"></div><div class="tl-t" style="font-size:10px;">42 new registrations</div><div class="tl-s">This week</div></div></div></div>
+        </div>
+      </div>
+      <!-- ANC / PNC Attendance -->
+      <div id="dho-anc" class="page">
+        <div class="ph"><div><div class="ph-title">ANC &amp; PNC Attendance</div><div class="ph-sub">Antenatal and postnatal care visit tracking across all zones</div></div><div class="ph-actions"><select class="fs" style="width:140px;"><option>January 2025</option><option>December 2024</option></select><button class="btn btn-teal">Export</button></div></div>
+        <div class="metrics" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+          <div class="metric"><div class="metric-lbl">ANC visits</div><div class="metric-val">847</div><div class="metric-sub">This month</div></div>
+          <div class="metric"><div class="metric-lbl">ANC rate</div><div class="metric-val" style="color:var(--amber);">76%</div><div class="metric-sub">Target: 85%</div></div>
+          <div class="metric"><div class="metric-lbl">PNC visits</div><div class="metric-val" style="color:var(--rose);">186</div><div class="metric-sub">This month</div></div>
+          <div class="metric"><div class="metric-lbl">PNC rate</div><div class="metric-val" style="color:var(--rose);">75%</div><div class="metric-sub">Target: 90%</div></div>
+        </div>
+        <div class="card"><table class="dt"><thead><tr><th>Zone</th><th>ANC Expected</th><th>ANC Done</th><th>ANC Rate</th><th>PNC Expected</th><th>PNC Done</th><th>PNC Rate</th><th>Trend</th><th>Status</th></tr></thead><tbody>
+          <tr><td style="font-weight:700;">Zone 1</td><td>142</td><td>116</td><td>82%</td><td>34</td><td>28</td><td>82%</td><td style="color:var(--teal);">stable</td><td><span class="badge b-low">On track</span></td></tr>
+          <tr><td style="font-weight:700;">Zone 2</td><td>98</td><td>66</td><td>67%</td><td>22</td><td>15</td><td>68%</td><td style="color:var(--red);">↓ declining</td><td><span class="badge b-med">Below target</span></td></tr>
+          <tr><td style="font-weight:700;">Zone 3</td><td>110</td><td>100</td><td>91%</td><td>28</td><td>26</td><td>93%</td><td style="color:var(--teal);">↑ improving</td><td><span class="badge b-low">Best zone</span></td></tr>
+          <tr><td style="font-weight:700;color:var(--red);">Zone 4</td><td>168</td><td>81</td><td style="color:var(--red);font-weight:700;">48%</td><td>42</td><td>24</td><td style="color:var(--red);">57%</td><td style="color:var(--red);">↓ critical</td><td><span class="badge b-high">Critical</span></td></tr>
+          <tr><td style="font-weight:700;">Zone 5</td><td>124</td><td>91</td><td>73%</td><td>30</td><td>24</td><td>80%</td><td style="color:var(--teal);">stable</td><td><span class="badge b-med">Below target</span></td></tr>
+          <tr><td style="font-weight:700;">Zone 6</td><td>131</td><td>111</td><td>85%</td><td>36</td><td>33</td><td>92%</td><td style="color:var(--teal);">↑ good</td><td><span class="badge b-low">On target</span></td></tr>
+          <tr><td style="font-weight:700;">Zone 7</td><td>115</td><td>69</td><td>60%</td><td>29</td><td>19</td><td>66%</td><td style="color:var(--red);">↓ declining</td><td><span class="badge b-med">Below target</span></td></tr>
+        </tbody></table></div>
+      </div>
+      <!-- Heatmap -->
+      <div id="dho-heatmap" class="page">
+        <div class="ph"><div><div class="ph-title">Risk Heatmap</div><div class="ph-sub">Geographic distribution of maternal risk — Zomba District</div></div><div class="ph-actions"><button class="btn">Export</button></div></div>
+        <div class="two-col">
+          <div class="card">
+            <div class="sh"><div class="sh-title">District risk grid — sub-zones</div><div style="display:flex;gap:8px;font-size:9px;"><span style="color:var(--red);">■ High</span><span style="color:var(--amber);">■ Medium</span><span style="color:var(--teal);">■ Low</span></div></div>
+            <div class="heatmap">
+              <div class="hm-cell" style="background:var(--red-l);color:#791F1F;">Z4-N</div><div class="hm-cell" style="background:var(--red-l);color:#791F1F;">Z4-C</div><div class="hm-cell" style="background:var(--amber-l);color:#633806;">Z2-C</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z1-N</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z3-E</div><div class="hm-cell" style="background:var(--amber-l);color:#633806;">Z7-W</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z6-N</div>
+              <div class="hm-cell" style="background:var(--amber-l);color:#633806;">Z4-S</div><div class="hm-cell" style="background:var(--red-l);color:#791F1F;">Z4-E</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z1-S</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z3-W</div><div class="hm-cell" style="background:var(--amber-l);color:#633806;">Z2-E</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z5-N</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z6-S</div>
+              <div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z5-S</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z3-N</div><div class="hm-cell" style="background:var(--amber-l);color:#633806;">Z2-W</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z1-E</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z6-E</div><div class="hm-cell" style="background:var(--amber-l);color:#633806;">Z7-E</div><div class="hm-cell" style="background:var(--teal-l);color:var(--teal-d);">Z5-C</div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:10px;"><div class="sh-title" style="margin-bottom:9px;">Predictive alerts</div><div class="al crit"><div class="al-dot" style="background:var(--red);"></div><div><div class="al-title" style="color:#791F1F;">Zone 4 — Critical cluster</div><div class="al-sub" style="color:var(--red);">31 high-risk. Deploy mobile clinic urgently.</div></div></div><div class="al warn" style="margin-bottom:0;"><div class="al-dot" style="background:var(--amber);"></div><div><div class="al-title" style="color:#633806;">Zone 2 — Rising trend</div><div class="al-sub" style="color:var(--amber);">Risk up 3 consecutive weeks. Intervene now.</div></div></div></div>
+            <div class="card"><div class="sh-title" style="margin-bottom:8px;">Resource allocation</div><div style="font-size:10px;color:var(--g600);line-height:1.9;"><div>🚑 Mobile clinic → Zone 4 (priority)</div><div>👩‍⚕️ Reassign 1 clinician Z3 → Z4</div><div>📞 More IVR outreach to Zone 2</div><div>💊 Restock iron supplements Z4 &amp; Z7</div></div><button class="btn btn-teal" style="margin-top:10px;width:100%;justify-content:center;font-size:11px;">Create action plan →</button></div>
+          </div>
+        </div>
+      </div>
+      <!-- Reports -->
+      <div id="dho-reports" class="page">
+        <div class="ph"><div><div class="ph-title">Reports</div><div class="ph-sub">Generate and download district health reports</div></div><div class="ph-actions"><button class="btn btn-teal">Custom report builder</button></div></div>
+        <div class="report-hd"><div class="report-title">Zomba District Maternal Health — January Week 3</div><div class="report-meta">23 Jan 2025 · Safe Mother Malawi · DHO Dr. D. Msiska</div><div class="report-stats"><div class="rs"><div class="rs-val">1,284</div><div class="rs-lbl">Registered mothers</div></div><div class="rs"><div class="rs-val">76%/75%</div><div class="rs-lbl">ANC/PNC rate</div></div><div class="rs"><div class="rs-val">89</div><div class="rs-lbl">High-risk cases</div></div><div class="rs"><div class="rs-val">14</div><div class="rs-lbl">Referrals</div></div></div></div>
+        <div class="three-col">
+          <div class="card"><div class="card-title">Saved reports</div><div class="timeline"><div class="tl-item"><div class="tl-dot" style="background:var(--teal);"></div><div class="tl-t" style="font-size:10px;">Jan Wk 3 report</div><div class="tl-s">PDF · 2.1MB · Today</div></div><div class="tl-item"><div class="tl-dot" style="background:var(--blue);"></div><div class="tl-t" style="font-size:10px;">Jan Wk 2 report</div><div class="tl-s">PDF · 1.9MB · Jan 16</div></div><div class="tl-item"><div class="tl-dot" style="background:var(--blue);"></div><div class="tl-t" style="font-size:10px;">December summary</div><div class="tl-s">PDF · 3.4MB · Jan 1</div></div><div class="tl-item" style="margin:0;"><div class="tl-dot" style="background:var(--g400);"></div><div class="tl-t" style="font-size:10px;">Q4 2024 quarterly</div><div class="tl-s">PDF · 5.8MB · Dec 31</div></div></div></div>
+          <div class="card"><div class="card-title">Custom report builder</div><div class="fg"><label class="fl">From date</label><input class="fi" type="date" value="2025-01-01"></div><div class="fg"><label class="fl">To date</label><input class="fi" type="date" value="2025-01-23"></div><div class="fg"><label class="fl">Zones</label><select class="fs"><option>All zones</option><option>Zone 4 only</option></select></div><div class="fg"><label class="fl">Patient type</label><select class="fs"><option>All (ANC + PNC)</option><option>Pregnant (ANC)</option><option>Postnatal (PNC)</option></select></div><button class="btn btn-teal" style="width:100%;justify-content:center;margin-top:4px;font-size:11px;">Generate report →</button></div>
+          <div class="card"><div class="card-title">Key findings</div><div style="font-size:10px;color:var(--g600);line-height:1.9;"><div>1. Zone 4 ANC critically low (48%)</div><div>2. Zone 4 PNC also low (57%)</div><div>3. High-risk cases up 16% month-on-month</div><div>4. 28 emergency IVR calls escalated</div><div>5. Zone 3 exceeds both ANC &amp; PNC targets</div></div><div class="al warn" style="margin-top:10px;"><div class="al-dot" style="background:var(--amber);"></div><div class="al-title" style="color:#633806;font-size:10px;">Resource deployment to Zone 4 before Week 4.</div></div></div>
+        </div>
+      </div>
+      <!-- Alerts -->
+      <div id="dho-alerts" class="page">
+        <div class="ph"><div><div class="ph-title">Alerts &amp; Escalations</div><div class="ph-sub">5 unresolved district-level alerts</div></div><div class="ph-actions"><button class="btn">Export log</button></div></div>
+        <div class="card">
+          <div class="ni unread"><div class="ni-icon" style="background:var(--red-l);">🚨</div><div><div class="ni-title">Emergency — Grace Nkosi, Zone 4 (Wk 28)</div><div class="ni-sub">BP 148/96, reduced fetal movement. Clinician Agnes Phiri notified. Pending hospital transfer.</div></div><div class="ni-time">12 min</div></div>
+          <div class="ni unread"><div class="ni-icon" style="background:var(--red-l);">🚨</div><div><div class="ni-title">High-risk cluster — Zone 4 North</div><div class="ni-sub">4 new high-risk cases flagged in same sub-zone this week. Possible outbreak indicator.</div></div><div class="ni-time">1 hr</div></div>
+          <div class="ni unread"><div class="ni-icon" style="background:var(--amber-l);">⚠️</div><div><div class="ni-title">ANC critical — Zone 4 (48%)</div><div class="ni-sub">Third consecutive week below 50%. Intervention plan required.</div></div><div class="ni-time">Daily</div></div>
+          <div class="ni unread"><div class="ni-icon" style="background:var(--rose-l);">👶</div><div><div class="ni-title">PNC missed — 3 mothers, Zone 7</div><div class="ni-sub">3 postnatal mothers missed day-7 visit. IVR follow-up sent. 1 unreachable.</div></div><div class="ni-time">2 hrs</div></div>
+          <div class="ni unread"><div class="ni-icon" style="background:var(--amber-l);">📦</div><div><div class="ni-title">Low stock — iron supplements, Zone 4 &amp; 7</div><div class="ni-sub">Below 2-week supply. Restock urgently.</div></div><div class="ni-time">Today</div></div>
+          <div class="ni"><div class="ni-icon" style="background:var(--teal-l);">✅</div><div><div class="ni-title">Referral resolved — Faith Mwale</div><div class="ni-sub">Admitted at Zomba Central. Status stable. Ward 6B.</div></div><div class="ni-time">Yesterday</div></div>
+        </div>
+      </div>
+      <!-- System Admin -->
+      <div id="dho-admin" class="page">
+        <div class="ph"><div><div class="ph-title">System Administration</div><div class="ph-sub">Users, access control, system health</div></div><div class="ph-actions"><button class="btn btn-teal">+ Add user</button></div></div>
+        <div class="two-col">
+          <div class="card"><div class="sh"><div class="sh-title">Registered staff</div></div><table class="dt"><thead><tr><th>Name</th><th>Role</th><th>Zone</th><th>Status</th><th></th></tr></thead><tbody>
+            <tr><td><div style="font-weight:700;font-size:12px;">Agnes Phiri</div></td><td><span class="badge b-blue">Clinician</span></td><td>Zone 4</td><td><span class="badge b-low">Active</span></td><td><button class="btn btn-sm">Edit</button></td></tr>
+            <tr><td><div style="font-weight:700;font-size:12px;">James Mwenye</div></td><td><span class="badge b-blue">Clinician</span></td><td>Zone 2</td><td><span class="badge b-low">Active</span></td><td><button class="btn btn-sm">Edit</button></td></tr>
+            <tr><td><div style="font-weight:700;font-size:12px;">Rose Banda</div></td><td><span class="badge b-blue">Clinician</span></td><td>Zone 6</td><td><span class="badge b-low">Active</span></td><td><button class="btn btn-sm">Edit</button></td></tr>
+            <tr><td><div style="font-weight:700;font-size:12px;">Dr. D. Msiska</div></td><td><span class="badge b-purple">DHO Admin</span></td><td>District</td><td><span class="badge b-low">Active</span></td><td><button class="btn btn-sm">Edit</button></td></tr>
+          </tbody></table></div>
+          <div>
+            <div class="card" style="margin-bottom:10px;"><div class="card-title">System health</div><div style="display:flex;flex-direction:column;gap:7px;font-size:11px;"><div style="display:flex;justify-content:space-between;"><span style="color:var(--g600);">API uptime</span><span class="badge b-low">99.8% ↑</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--g600);">IVR system</span><span class="badge b-low">Operational</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--g600);">Push notifications</span><span class="badge b-low">Active</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--g600);">Data sync</span><span class="badge b-low">2 min ago</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--g600);">Offline mode</span><span class="badge b-low">Enabled</span></div></div></div>
+            <div class="card"><div class="card-title">Role-based access</div><div style="font-size:10px;color:var(--g600);line-height:1.9;"><div>🤰 <strong>Pregnant patient</strong> — App · own ANC data only</div><div>👶 <strong>Postnatal patient</strong> — App · own PNC + baby data</div><div>🩺 <strong>Clinician</strong> — Own patients, alerts, referrals</div><div>📊 <strong>DHO/Admin</strong> — Full district analytics</div><div>⚙️ <strong>Super Admin</strong> — Full system access</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showRole(r) {
+  document.querySelectorAll('.role-screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('role-' + r).classList.add('active');
+  event.target.classList.add('active');
+}
+function switchPage(role, pageId, el) {
+  const parent = document.getElementById('role-' + role);
+  parent.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  parent.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
