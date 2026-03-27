@@ -7,6 +7,7 @@ import '../../../core/models/anc_visit.dart';
 import '../../../core/models/mother_profile.dart';
 import '../../../core/theme/app_theme.dart';
 import '../repositories/home_repository.dart';
+import '../../notifications/repositories/notifications_repository.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -22,9 +23,41 @@ class HomeScreen extends ConsumerWidget {
         elevation: 0,
         title: const Text('Safe Mother Malawi'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () => context.push('/notifications'),
+          Consumer(
+            builder: (context, ref, _) {
+              final unread = ref.watch(unreadCountProvider);
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                    onPressed: () => context.push('/notifications'),
+                  ),
+                  if (unread > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        decoration: const BoxDecoration(
+                          color: AppColors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$unread',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -139,7 +172,7 @@ class _TealHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.teal, AppColors.tealDark],
+          colors: [AppColors.navy, AppColors.navBar],
         ),
       ),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -149,7 +182,7 @@ class _TealHeader extends StatelessWidget {
           Text(
             'Mwadziwani,',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                 ),
           ),
           const SizedBox(height: 4),
@@ -164,7 +197,7 @@ class _TealHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -192,7 +225,7 @@ class _DangerSignBanner extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.red.withOpacity(0.1),
+          color: AppColors.red.withValues(alpha: 0.1),
           border: Border.all(color: AppColors.red),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -315,28 +348,28 @@ class _QuickAccessGrid extends StatelessWidget {
         emoji: '🚨',
         title: 'Danger Signs',
         subtitle: 'Know the warning signs',
-        bgColor: AppColors.red.withOpacity(0.1),
+        bgColor: AppColors.redLight,
         route: '/danger-signs',
       ),
       _QuickTile(
         emoji: '📅',
         title: 'ANC Visits',
         subtitle: 'Your appointments',
-        bgColor: AppColors.blue.withOpacity(0.1),
+        bgColor: AppColors.blueLight,
         route: '/anc-visits',
       ),
       _QuickTile(
         emoji: '🥗',
         title: 'Nutrition',
         subtitle: 'Healthy eating tips',
-        bgColor: AppColors.amber.withOpacity(0.1),
+        bgColor: AppColors.amberLight,
         route: '/learn',
       ),
       _QuickTile(
         emoji: '❤️',
         title: 'Health Check',
         subtitle: 'Weekly self-check',
-        bgColor: const Color(0xFFEDE7F6),
+        bgColor: AppColors.purpleLight,
         route: '/health-check',
       ),
     ];

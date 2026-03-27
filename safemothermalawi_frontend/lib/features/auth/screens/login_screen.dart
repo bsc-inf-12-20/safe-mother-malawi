@@ -24,9 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _pinFocusNode = FocusNode();
 
   bool _isLoading = false;
-  bool _isPregnantMode = true; // only Pregnant is functional
 
-  // Lockout state
   Timer? _lockoutTimer;
   int _lockoutSecondsRemaining = 0;
 
@@ -45,15 +43,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _lockoutTimer?.cancel();
     setState(() => _lockoutSecondsRemaining = seconds);
     _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
+      if (!mounted) { timer.cancel(); return; }
       setState(() {
         _lockoutSecondsRemaining--;
-        if (_lockoutSecondsRemaining <= 0) {
-          timer.cancel();
-        }
+        if (_lockoutSecondsRemaining <= 0) timer.cancel();
       });
     });
   }
@@ -61,28 +54,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String _formatLockout(int seconds) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
-    if (m > 0) return '$m minutes $s seconds';
-    return '$s seconds';
+    return m > 0 ? '$m minutes $s seconds' : '$s seconds';
   }
 
   Future<void> _submit(bool isOnline) async {
     if (!isOnline || _isLockedOut || _isLoading) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
     setState(() => _isLoading = true);
     try {
-      final repo = ref.read(authRepositoryProvider);
-      await repo.login(_phoneController.text.trim(), _pinController.text.trim());
+      await ref.read(authRepositoryProvider).login(
+            _phoneController.text.trim(),
+            _pinController.text.trim(),
+          );
       if (mounted) context.goNamed(AppRoutes.home);
     } on LockoutException catch (e) {
       _startLockoutTimer(e.remainingSeconds);
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-            backgroundColor: AppColors.error,
-          ),
+          SnackBar(content: Text(e.message), backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -97,71 +87,66 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       initialData: true,
       builder: (context, snapshot) {
         final isOnline = snapshot.data ?? true;
-        return _buildScaffold(context, isOnline);
-      },
-    );
-  }
-
-  Widget _buildScaffold(BuildContext context, bool isOnline) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          // Offline banner
-          if (!isOnline) _OfflineBanner(),
-          // Lockout banner
-          if (_isLockedOut)
-            _LockoutBanner(
-              message:
-                  'Account locked. Try again in ${_formatLockout(_lockoutSecondsRemaining)}',
-            ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _TealHeader(),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: _LoginCard(
-                      formKey: _formKey,
-                      phoneController: _phoneController,
-                      pinController: _pinController,
-                      pinFocusNode: _pinFocusNode,
-                      isPregnantMode: _isPregnantMode,
-                      isLoading: _isLoading,
-                      isOnline: isOnline,
-                      isLockedOut: _isLockedOut,
-                      onModeChanged: (pregnant) =>
-                          setState(() => _isPregnantMode = pregnant),
-                      onSubmit: () => _submit(isOnline),
-                    ),
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: Column(
+            children: [
+              if (!isOnline) _Banner(message: 'No internet connection', color: AppColors.error),
+              if (_isLockedOut)
+                _Banner(
+                  message: 'Account locked. Try again in ${_formatLockout(_lockoutSecondsRemaining)}',
+                  color: AppColors.amber,
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _NavHeader(),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: _LoginCard(
+                          formKey: _formKey,
+                          phoneController: _phoneController,
+                          pinController: _pinController,
+                          pinFocusNode: _pinFocusNode,
+                          isLoading: _isLoading,
+                          isOnline: isOnline,
+                          isLockedOut: _isLockedOut,
+                          onSubmit: () => _submit(isOnline),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Sub-widgets
+// Banner (offline / lockout)
 // ---------------------------------------------------------------------------
 
-class _OfflineBanner extends StatelessWidget {
+class _Banner extends StatelessWidget {
+  const _Banner({required this.message, required this.color});
+  final String message;
+  final Color color;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AppColors.error,
+      color: color,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: const SafeArea(
+      child: SafeArea(
         bottom: false,
         child: Text(
-          'No internet connection',
-          style: TextStyle(
+          message,
+          style: const TextStyle(
             color: Colors.white,
             fontFamily: 'DM Sans',
             fontSize: 13,
@@ -174,36 +159,16 @@ class _OfflineBanner extends StatelessWidget {
   }
 }
 
-class _LockoutBanner extends StatelessWidget {
-  const _LockoutBanner({required this.message});
-  final String message;
+// ---------------------------------------------------------------------------
+// Header — uses navBar colour
+// ---------------------------------------------------------------------------
 
+class _NavHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AppColors.error,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Text(
-        message,
-        style: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'DM Sans',
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-class _TealHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: AppColors.tealDark,
+      color: AppColors.navBar,
       padding: const EdgeInsets.only(top: 60, bottom: 32, left: 24, right: 24),
       child: Column(
         children: [
@@ -211,13 +176,11 @@ class _TealHeader extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: const Color(0xFF073D32),
+              color: AppColors.sidebar,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.teal, width: 2),
+              border: Border.all(color: AppColors.navy, width: 2),
             ),
-            child: const Center(
-              child: Text('🤰', style: TextStyle(fontSize: 28)),
-            ),
+            child: const Center(child: Text('🤰', style: TextStyle(fontSize: 28))),
           ),
           const SizedBox(height: 12),
           const Text(
@@ -235,7 +198,7 @@ class _TealHeader extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'DM Sans',
               fontSize: 13,
-              color: AppColors.teal,
+              color: AppColors.blueLight,
             ),
           ),
         ],
@@ -244,17 +207,19 @@ class _TealHeader extends StatelessWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Login card
+// ---------------------------------------------------------------------------
+
 class _LoginCard extends StatelessWidget {
   const _LoginCard({
     required this.formKey,
     required this.phoneController,
     required this.pinController,
     required this.pinFocusNode,
-    required this.isPregnantMode,
     required this.isLoading,
     required this.isOnline,
     required this.isLockedOut,
-    required this.onModeChanged,
     required this.onSubmit,
   });
 
@@ -262,18 +227,15 @@ class _LoginCard extends StatelessWidget {
   final TextEditingController phoneController;
   final TextEditingController pinController;
   final FocusNode pinFocusNode;
-  final bool isPregnantMode;
   final bool isLoading;
   final bool isOnline;
   final bool isLockedOut;
-  final ValueChanged<bool> onModeChanged;
   final VoidCallback onSubmit;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      shadowColor: Colors.black12,
+      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -282,17 +244,9 @@ class _LoginCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _ModeSelector(
-                isPregnantMode: isPregnantMode,
-                onChanged: onModeChanged,
-              ),
-              const SizedBox(height: 24),
               _PhoneField(controller: phoneController),
               const SizedBox(height: 20),
-              _PinInput(
-                controller: pinController,
-                focusNode: pinFocusNode,
-              ),
+              _PinInput(controller: pinController, focusNode: pinFocusNode),
               const SizedBox(height: 28),
               _SubmitButton(
                 isLoading: isLoading,
@@ -309,92 +263,9 @@ class _LoginCard extends StatelessWidget {
   }
 }
 
-class _ModeSelector extends StatelessWidget {
-  const _ModeSelector({
-    required this.isPregnantMode,
-    required this.onChanged,
-  });
-
-  final bool isPregnantMode;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _ModeCard(
-            emoji: '🤰',
-            label: 'Pregnant',
-            isSelected: isPregnantMode,
-            selectedColor: AppColors.teal,
-            onTap: () => onChanged(true),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _ModeCard(
-            emoji: '👶',
-            label: 'Postnatal',
-            isSelected: !isPregnantMode,
-            selectedColor: AppColors.rose,
-            onTap: () => onChanged(false),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ModeCard extends StatelessWidget {
-  const _ModeCard({
-    required this.emoji,
-    required this.label,
-    required this.isSelected,
-    required this.selectedColor,
-    required this.onTap,
-  });
-
-  final String emoji;
-  final String label;
-  final bool isSelected;
-  final Color selectedColor;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? selectedColor.withOpacity(0.08) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? selectedColor : AppColors.outline,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'DM Sans',
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? selectedColor : AppColors.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// ---------------------------------------------------------------------------
+// Phone field
+// ---------------------------------------------------------------------------
 
 class _PhoneField extends StatelessWidget {
   const _PhoneField({required this.controller});
@@ -415,13 +286,15 @@ class _PhoneField extends StatelessWidget {
           color: AppColors.onSurface,
         ),
       ),
-      validator: (v) {
-        if (v == null || v.trim().isEmpty) return 'Enter your phone number';
-        return null;
-      },
+      validator: (v) =>
+          (v == null || v.trim().isEmpty) ? 'Enter your phone number' : null,
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// PIN input
+// ---------------------------------------------------------------------------
 
 class _PinInput extends StatefulWidget {
   const _PinInput({required this.controller, required this.focusNode});
@@ -466,12 +339,10 @@ class _PinInputState extends State<_PinInput> {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: filled
-                      ? AppColors.tealLight
-                      : AppColors.surface,
+                  color: filled ? AppColors.blueLight : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: filled ? AppColors.teal : AppColors.outline,
+                    color: filled ? AppColors.navy : AppColors.outline,
                     width: filled ? 2 : 1,
                   ),
                 ),
@@ -481,7 +352,7 @@ class _PinInputState extends State<_PinInput> {
                           width: 12,
                           height: 12,
                           decoration: const BoxDecoration(
-                            color: AppColors.tealDark,
+                            color: AppColors.navBar,
                             shape: BoxShape.circle,
                           ),
                         )
@@ -491,7 +362,6 @@ class _PinInputState extends State<_PinInput> {
             }),
           ),
         ),
-        // Hidden text field that captures input
         SizedBox(
           height: 0,
           child: TextFormField(
@@ -501,20 +371,19 @@ class _PinInputState extends State<_PinInput> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             obscureText: true,
-            decoration: const InputDecoration(
-              counterText: '',
-              border: InputBorder.none,
-            ),
-            validator: (v) {
-              if (v == null || v.length < 4) return 'Enter your 4-digit PIN';
-              return null;
-            },
+            decoration: const InputDecoration(counterText: '', border: InputBorder.none),
+            validator: (v) =>
+                (v == null || v.length < 4) ? 'Enter your 4-digit PIN' : null,
           ),
         ),
       ],
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Submit button
+// ---------------------------------------------------------------------------
 
 class _SubmitButton extends StatelessWidget {
   const _SubmitButton({
@@ -532,8 +401,8 @@ class _SubmitButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isEnabled && !isLoading ? onPressed : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.teal,
-        disabledBackgroundColor: AppColors.teal.withOpacity(0.4),
+        backgroundColor: AppColors.navy,
+        disabledBackgroundColor: AppColors.navy.withValues(alpha: 0.4),
         minimumSize: const Size(double.infinity, 52),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -541,10 +410,7 @@ class _SubmitButton extends StatelessWidget {
           ? const SizedBox(
               width: 22,
               height: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Colors.white,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
             )
           : const Text(
               'Sign In',
@@ -559,15 +425,19 @@ class _SubmitButton extends StatelessWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// IVR notice pill
+// ---------------------------------------------------------------------------
+
 class _IvrNoticePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.blue.withOpacity(0.12),
+        color: AppColors.blueLight,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.blue.withOpacity(0.3)),
+        border: Border.all(color: AppColors.blue.withValues(alpha: 0.3)),
       ),
       child: const Text(
         '📞  No smartphone? Dial 800-SAFE-MOM',
@@ -576,7 +446,7 @@ class _IvrNoticePill extends StatelessWidget {
           fontFamily: 'DM Sans',
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: AppColors.blue,
+          color: AppColors.navy,
         ),
       ),
     );

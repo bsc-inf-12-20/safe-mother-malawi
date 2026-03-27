@@ -9,6 +9,10 @@ import '../../features/home/screens/home_screen.dart';
 import '../../features/pregnancy_tracking/screens/pregnancy_tracking_screen.dart';
 import '../../features/danger_signs/screens/danger_signs_screen.dart';
 import '../../features/health_check/screens/health_check_screen.dart';
+import '../../features/anc_visits/screens/anc_visits_screen.dart';
+import '../../features/learn/screens/learn_screen.dart';
+import '../../features/profile/screens/profile_screen.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
 
 // ---------------------------------------------------------------------------
 // Route names
@@ -26,28 +30,6 @@ class AppRoutes {
   static const String learn = 'learn';
   static const String profile = 'profile';
   static const String notifications = 'notifications';
-}
-
-// ---------------------------------------------------------------------------
-// Placeholder screen used for routes not yet implemented
-// ---------------------------------------------------------------------------
-class _PlaceholderScreen extends StatelessWidget {
-  const _PlaceholderScreen({required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text(
-          '$title\n(coming soon)',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -104,22 +86,22 @@ GoRouter buildAppRouter() {
       GoRoute(
         path: '/anc-visits',
         name: AppRoutes.ancVisits,
-        builder: (context, state) => const _PlaceholderScreen(title: 'ANC Visits'),
+        builder: (context, state) => const AncVisitsScreen(),
       ),
       GoRoute(
         path: '/learn',
         name: AppRoutes.learn,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Learn'),
+        builder: (context, state) => const LearnScreen(),
       ),
       GoRoute(
         path: '/profile',
         name: AppRoutes.profile,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Profile'),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/notifications',
         name: AppRoutes.notifications,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Notifications'),
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
   );

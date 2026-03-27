@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF04342C),
+      backgroundColor: AppColors.navBar,
       body: SafeArea(
         child: Stack(
           children: [
@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
                       fontFamily: 'DM Sans',
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.teal,
+                      color: AppColors.blueLight,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
                     style: TextStyle(
                       fontFamily: 'DM Sans',
                       fontSize: 13,
-                      color: Color(0xFF8AADA6),
+                      color: AppColors.muted,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -119,7 +119,7 @@ class _SplashScreenState extends State<SplashScreen>
                     style: TextStyle(
                       fontFamily: 'DM Sans',
                       fontSize: 11,
-                      color: Color(0xFF5A8A80),
+                      color: AppColors.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -145,9 +145,9 @@ class _LogoMark extends StatelessWidget {
       width: 72,
       height: 72,
       decoration: BoxDecoration(
-        color: const Color(0xFF073D32),
+        color: AppColors.sidebar,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.teal, width: 2),
+        border: Border.all(color: AppColors.navy, width: 2),
       ),
       child: const Center(
         child: Text(
@@ -193,9 +193,9 @@ class _MohBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFF073D32),
+        color: AppColors.sidebar,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.teal.withOpacity(0.4), width: 1),
+        border: Border.all(color: AppColors.navy.withValues(alpha: 0.4), width: 1),
       ),
       child: const Text(
         'Ministry of Health · Republic of Malawi',
