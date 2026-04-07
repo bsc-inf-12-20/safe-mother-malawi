@@ -48,11 +48,15 @@ class _AdminOverviewState extends State<AdminOverview> {
         return const InsightsScreen();
       case '/question-insights':
         return const InsightsScreen();
+      case '/insights':
+        return const InsightsScreen();
       case '/task-analytics':
         return const ActivityLogsScreen();
       case '/rule-builder':
         return const RuleBuilder();
       case '/system-logs':
+        return const ActivityLogsScreen();
+      case '/activity-logs':
         return const ActivityLogsScreen();
       case '/reports':
         return const ReportsScreen();
@@ -71,9 +75,11 @@ class _AdminOverviewState extends State<AdminOverview> {
       '/heatmaps': 'Heatmaps',
       '/ivr-insights': 'Insights',
       '/question-insights': 'Insights',
+      '/insights': 'Insights',
       '/task-analytics': 'Activity Logs',
       '/rule-builder': 'Rule Builder',
       '/system-logs': 'Activity Logs',
+      '/activity-logs': 'Activity Logs',
       '/reports': 'Reports',
     };
     return titles[_currentRoute] ?? 'Dashboard';
