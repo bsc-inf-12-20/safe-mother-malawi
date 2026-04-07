@@ -20,7 +20,6 @@ import 'ivr_insights.dart';
 import 'question_insights.dart';
 import 'system_logs.dart';
 import 'task_analytics.dart';
-import '../role_selector.dart';
 
 class AdminOverview extends StatefulWidget {
   const AdminOverview({super.key});
@@ -97,10 +96,6 @@ class _AdminOverviewState extends State<AdminOverview> {
       currentRoute: _currentRoute,
       pageTitle: _pageTitle,
       onNavigate: _navigate,
-      onLogout: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const RoleSelector()),
-      ),
       body: _buildPage(),
     );
   }
