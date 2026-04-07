@@ -70,11 +70,11 @@ class _AdminOverviewState extends State<AdminOverview> {
       '/generate-analytics': 'Generate Analytics',
       '/analytics': 'Analytics Dashboard',
       '/heatmaps': 'Heatmaps',
-      '/ivr-insights': 'IVR Insights',
-      '/question-insights': 'Question Insights',
-      '/task-analytics': 'Task Analytics',
+      '/ivr-insights': 'Insights — IVR',
+      '/question-insights': 'Insights — Questions',
+      '/task-analytics': 'Activity Logs — Tasks',
       '/rule-builder': 'Rule Builder',
-      '/system-logs': 'System Logs',
+      '/system-logs': 'Activity Logs — System',
       '/reports': 'Reports',
     };
     return titles[_currentRoute] ?? 'Dashboard';
