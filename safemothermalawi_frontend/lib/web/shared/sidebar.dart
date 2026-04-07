@@ -26,7 +26,7 @@ const List<NavItem> _flatItems = [
   NavItem(label: 'Data Source', icon: Icons.storage_rounded, route: '/data-explorer', allowedRoles: [UserRole.admin, UserRole.dho]),
   NavItem(label: 'Generate Analytics', icon: Icons.auto_graph_rounded, route: '/generate-analytics', allowedRoles: [UserRole.admin, UserRole.dho]),
   NavItem(label: 'Analytics Dashboard', icon: Icons.bar_chart_rounded, route: '/analytics', allowedRoles: [UserRole.admin, UserRole.dho]),
-  NavItem(label: 'Rule Builder', icon: Icons.account_tree_rounded, route: '/rule-builder', allowedRoles: [UserRole.admin, UserRole.dho]),
+  NavItem(label: 'Rule Builder', icon: Icons.account_tree_rounded, route: '/rule-builder', allowedRoles: [UserRole.admin]),
   NavItem(label: 'Reports', icon: Icons.summarize_rounded, route: '/reports', allowedRoles: [UserRole.admin, UserRole.dho]),
 ];
 
