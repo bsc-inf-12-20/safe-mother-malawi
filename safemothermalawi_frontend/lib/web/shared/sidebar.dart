@@ -30,16 +30,16 @@ const List<NavItem> _flatItems = [
   NavItem(label: 'Reports', icon: Icons.summarize_rounded, route: '/reports', allowedRoles: [UserRole.admin, UserRole.dho]),
 ];
 
-// Insights group — navigates to /insights (combined screen)
+// Insights group — each child navigates to its own individual screen
 const _insightsChildren = [
-  NavItem(label: 'IVR Insights', icon: Icons.phone_in_talk_rounded, route: '/insights', allowedRoles: [UserRole.admin, UserRole.dho]),
-  NavItem(label: 'Question Insights', icon: Icons.quiz_rounded, route: '/insights', allowedRoles: [UserRole.admin, UserRole.dho]),
+  NavItem(label: 'IVR Insights', icon: Icons.phone_in_talk_rounded, route: '/ivr-insights', allowedRoles: [UserRole.admin, UserRole.dho]),
+  NavItem(label: 'Question Insights', icon: Icons.quiz_rounded, route: '/question-insights', allowedRoles: [UserRole.admin, UserRole.dho]),
 ];
 
-// Activity Logs group — navigates to /activity-logs (combined screen)
+// Activity Logs group — each child navigates to its own individual screen
 const _activityChildren = [
-  NavItem(label: 'System Logs', icon: Icons.receipt_long_rounded, route: '/activity-logs', allowedRoles: [UserRole.admin]),
-  NavItem(label: 'Task Analytics', icon: Icons.task_alt_rounded, route: '/activity-logs', allowedRoles: [UserRole.admin]),
+  NavItem(label: 'System Logs', icon: Icons.receipt_long_rounded, route: '/system-logs', allowedRoles: [UserRole.admin]),
+  NavItem(label: 'Task Analytics', icon: Icons.task_alt_rounded, route: '/task-analytics', allowedRoles: [UserRole.admin]),
 ];
 
 class AppSidebar extends StatefulWidget {
@@ -64,8 +64,8 @@ class _AppSidebarState extends State<AppSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    final isInsightsActive = widget.currentRoute == '/insights';
-    final isActivityActive = widget.currentRoute == '/activity-logs';
+    final isInsightsActive = widget.currentRoute == '/ivr-insights' || widget.currentRoute == '/question-insights' || widget.currentRoute == '/insights';
+    final isActivityActive = widget.currentRoute == '/system-logs' || widget.currentRoute == '/task-analytics' || widget.currentRoute == '/activity-logs';
 
     return Container(
       width: 240,

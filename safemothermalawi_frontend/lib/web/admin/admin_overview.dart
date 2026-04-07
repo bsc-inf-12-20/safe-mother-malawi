@@ -16,6 +16,10 @@ import 'heatmap_screen.dart';
 import 'rule_builder.dart';
 import 'insights_screen.dart';
 import 'activity_logs_screen.dart';
+import 'ivr_insights.dart';
+import 'question_insights.dart';
+import 'system_logs.dart';
+import 'task_analytics.dart';
 import '../role_selector.dart';
 
 class AdminOverview extends StatefulWidget {
@@ -45,17 +49,17 @@ class _AdminOverviewState extends State<AdminOverview> {
       case '/heatmaps':
         return const HeatmapScreen();
       case '/ivr-insights':
-        return const InsightsScreen();
+        return const IvrInsights();
       case '/question-insights':
-        return const InsightsScreen();
+        return const QuestionInsights();
       case '/insights':
         return const InsightsScreen();
       case '/task-analytics':
-        return const ActivityLogsScreen();
+        return const TaskAnalytics();
       case '/rule-builder':
         return const RuleBuilder();
       case '/system-logs':
-        return const ActivityLogsScreen();
+        return const SystemLogs();
       case '/activity-logs':
         return const ActivityLogsScreen();
       case '/reports':
@@ -73,12 +77,12 @@ class _AdminOverviewState extends State<AdminOverview> {
       '/generate-analytics': 'Generate Analytics',
       '/analytics': 'Analytics Dashboard',
       '/heatmaps': 'Heatmaps',
-      '/ivr-insights': 'Insights',
-      '/question-insights': 'Insights',
+      '/ivr-insights': 'IVR Insights',
+      '/question-insights': 'Question Insights',
       '/insights': 'Insights',
-      '/task-analytics': 'Activity Logs',
+      '/task-analytics': 'Task Analytics',
       '/rule-builder': 'Rule Builder',
-      '/system-logs': 'Activity Logs',
+      '/system-logs': 'System Logs',
       '/activity-logs': 'Activity Logs',
       '/reports': 'Reports',
     };
