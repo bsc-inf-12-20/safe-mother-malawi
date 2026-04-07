@@ -184,7 +184,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 // Remaining flat items
                 ..._flatItems
                     .where((i) => i.allowedRoles.contains(widget.role))
-                    .where((i) => ['Reports'].contains(i.label))
+                    .where((i) => <String>[].contains(i.label))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
               ],
             ),
