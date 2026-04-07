@@ -8,10 +8,9 @@ import '../shared/widgets/kpi_card.dart';
 import '../shared/widgets/status_badge.dart';
 import '../shared/widgets/chart_card.dart';
 import 'system_users.dart';
-import 'analytics_dashboard.dart';
 import 'reports_screen.dart';
-import 'rule_builder.dart';
 import 'system_logs.dart';
+import 'audit_export.dart';
 
 class AdminOverview extends StatefulWidget {
   const AdminOverview({super.key});
@@ -31,12 +30,10 @@ class _AdminOverviewState extends State<AdminOverview> {
     switch (_currentRoute) {
       case '/clinicians':
         return const SystemUsers();
-      case '/analytics':
-        return const AnalyticsDashboard();
-      case '/rule-builder':
-        return const RuleBuilder();
       case '/system-logs':
         return const SystemLogs();
+      case '/audit-export':
+        return const AuditExport();
       case '/reports':
         return const ReportsScreen();
       default:
@@ -48,9 +45,8 @@ class _AdminOverviewState extends State<AdminOverview> {
     const titles = {
       '/overview': 'Overview',
       '/clinicians': 'System Users',
-      '/analytics': 'National Analytics',
-      '/rule-builder': 'Rule Builder',
       '/system-logs': 'System Logs',
+      '/audit-export': 'Audit Export',
       '/reports': 'Reports',
     };
     return titles[_currentRoute] ?? 'Admin Dashboard';

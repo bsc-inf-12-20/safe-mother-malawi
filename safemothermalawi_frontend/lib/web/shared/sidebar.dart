@@ -25,8 +25,8 @@ const List<NavItem> _flatItems = [
 
   // Admin only — national system management
   NavItem(label: 'System Users', icon: Icons.manage_accounts_rounded, route: '/clinicians', allowedRoles: [UserRole.admin]),
-  NavItem(label: 'National Analytics', icon: Icons.bar_chart_rounded, route: '/analytics', allowedRoles: [UserRole.admin]),
-  NavItem(label: 'Rule Builder', icon: Icons.account_tree_rounded, route: '/rule-builder', allowedRoles: [UserRole.admin]),
+  NavItem(label: 'System Logs', icon: Icons.receipt_long_rounded, route: '/system-logs', allowedRoles: [UserRole.admin]),
+  NavItem(label: 'Audit Export', icon: Icons.download_for_offline_rounded, route: '/audit-export', allowedRoles: [UserRole.admin]),
   NavItem(label: 'Reports', icon: Icons.summarize_rounded, route: '/reports', allowedRoles: [UserRole.admin]),
 
   // DHO only — district-specific
@@ -129,7 +129,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 // Flat items before groups
                 ..._flatItems
                     .where((i) => i.allowedRoles.contains(widget.role))
-                    .where((i) => ['Overview', 'System Users', 'Clinician Management', 'Data Source', 'Generate Analytics', 'Analytics Dashboard', 'National Analytics'].contains(i.label))
+                    .where((i) => ['Overview', 'System Users', 'System Logs', 'Audit Export', 'Reports', 'Clinician Management', 'Data Source', 'Generate Analytics', 'Analytics Dashboard'].contains(i.label))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
 
                 // Insights group — DHO only
@@ -156,33 +156,35 @@ class _AppSidebarState extends State<AppSidebar> {
                   ),
                 ],
 
-                // Activity Logs group — Admin: System Logs only | DHO: System Logs + Task Analytics
-                _GroupHeader(
-                  label: 'Activity Logs',
-                  icon: Icons.history_rounded,
-                  isOpen: _activityOpen,
-                  isActive: isActivityActive,
-                  onTap: () => setState(() => _activityOpen = !_activityOpen),
-                ),
-                AnimatedCrossFade(
-                  duration: const Duration(milliseconds: 200),
-                  crossFadeState: _activityOpen ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                  firstChild: Padding(
-                    padding: const EdgeInsets.only(left: 12),
-                    child: Column(
-                      children: _activityChildren
-                          .where((c) => c.allowedRoles.contains(widget.role))
-                          .map((c) => _NavTile(item: c, isActive: isActivityActive, onTap: () => widget.onNavigate(c.route), isChild: true))
-                          .toList(),
+                // Activity Logs group — DHO only
+                if (widget.role == UserRole.dho) ...[
+                  _GroupHeader(
+                    label: 'Activity Logs',
+                    icon: Icons.history_rounded,
+                    isOpen: _activityOpen,
+                    isActive: isActivityActive,
+                    onTap: () => setState(() => _activityOpen = !_activityOpen),
+                  ),
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 200),
+                    crossFadeState: _activityOpen ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                    firstChild: Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Column(
+                        children: _activityChildren
+                            .where((c) => c.allowedRoles.contains(widget.role))
+                            .map((c) => _NavTile(item: c, isActive: isActivityActive, onTap: () => widget.onNavigate(c.route), isChild: true))
+                            .toList(),
                       ),
                     ),
                     secondChild: const SizedBox.shrink(),
                   ),
+                ],
 
                 // Remaining flat items
                 ..._flatItems
                     .where((i) => i.allowedRoles.contains(widget.role))
-                    .where((i) => ['Rule Builder', 'Reports'].contains(i.label))
+                    .where((i) => ['Reports'].contains(i.label))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
               ],
             ),
