@@ -12,7 +12,7 @@ import 'analytics_dashboard.dart';
 import 'reports_screen.dart';
 import 'data_explorer.dart';
 import 'generate_analytics.dart';
-import 'rule_builder.dart';import 'rule_builder.dart';
+import 'rule_builder.dart';
 import 'insights_screen.dart';
 import 'activity_logs_screen.dart';
 import 'ivr_insights.dart';
@@ -74,7 +74,6 @@ class _AdminOverviewState extends State<AdminOverview> {
       '/data-explorer': 'Data Source',
       '/generate-analytics': 'Generate Analytics',
       '/analytics': 'Analytics Dashboard',
-      '/heatmaps': 'Heatmaps',
       '/ivr-insights': 'IVR Insights',
       '/question-insights': 'Question Insights',
       '/insights': 'Insights',
