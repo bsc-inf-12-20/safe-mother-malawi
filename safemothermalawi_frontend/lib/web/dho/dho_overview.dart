@@ -11,10 +11,6 @@ import '../admin/clinician_management.dart';
 import '../admin/data_explorer.dart';
 import '../admin/generate_analytics.dart';
 import '../admin/analytics_dashboard.dart';
-import '../admin/ivr_insights.dart';
-import '../admin/question_insights.dart';
-import '../admin/system_logs.dart';
-import '../admin/task_analytics.dart';
 import '../admin/reports_screen.dart';
 
 class DhoOverview extends StatefulWidget {
@@ -39,14 +35,6 @@ class _DhoOverviewState extends State<DhoOverview> {
         return const GenerateAnalytics();
       case '/analytics':
         return const AnalyticsDashboard();
-      case '/ivr-insights':
-        return const IvrInsights();
-      case '/question-insights':
-        return const QuestionInsights();
-      case '/task-analytics':
-        return const TaskAnalytics();
-      case '/system-logs':
-        return const SystemLogs();
       case '/reports':
         return const ReportsScreen();
       default:
@@ -61,10 +49,6 @@ class _DhoOverviewState extends State<DhoOverview> {
       '/data-explorer': 'Data Source',
       '/generate-analytics': 'Generate Analytics',
       '/analytics': 'Analytics Dashboard',
-      '/ivr-insights': 'IVR Insights',
-      '/question-insights': 'Question Insights',
-      '/task-analytics': 'Task Analytics',
-      '/system-logs': 'System Logs',
       '/reports': 'Reports',
     };
     return titles[_currentRoute] ?? 'DHO Dashboard';
