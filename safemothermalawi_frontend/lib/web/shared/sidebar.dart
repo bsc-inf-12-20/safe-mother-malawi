@@ -37,16 +37,16 @@ const List<NavItem> _flatItems = [
   NavItem(label: 'Reports', icon: Icons.summarize_rounded, route: '/reports', allowedRoles: [UserRole.dho]),
 ];
 
-// Insights group — DHO only
+// Insights group — Admin only
 const _insightsChildren = [
-  NavItem(label: 'IVR Insights', icon: Icons.phone_in_talk_rounded, route: '/ivr-insights', allowedRoles: [UserRole.dho]),
-  NavItem(label: 'Question Insights', icon: Icons.quiz_rounded, route: '/question-insights', allowedRoles: [UserRole.dho]),
+  NavItem(label: 'IVR Insights', icon: Icons.phone_in_talk_rounded, route: '/ivr-insights', allowedRoles: [UserRole.admin]),
+  NavItem(label: 'Question Insights', icon: Icons.quiz_rounded, route: '/question-insights', allowedRoles: [UserRole.admin]),
 ];
 
-// Activity Logs group — Admin: system-wide | DHO: district logs
+// Activity Logs group — Admin only
 const _activityChildren = [
-  NavItem(label: 'System Logs', icon: Icons.receipt_long_rounded, route: '/system-logs', allowedRoles: [UserRole.admin, UserRole.dho]),
-  NavItem(label: 'Task Analytics', icon: Icons.task_alt_rounded, route: '/task-analytics', allowedRoles: [UserRole.dho]),
+  NavItem(label: 'System Logs', icon: Icons.receipt_long_rounded, route: '/system-logs', allowedRoles: [UserRole.admin]),
+  NavItem(label: 'Task Analytics', icon: Icons.task_alt_rounded, route: '/task-analytics', allowedRoles: [UserRole.admin]),
 ];
 
 class AppSidebar extends StatefulWidget {
@@ -132,8 +132,8 @@ class _AppSidebarState extends State<AppSidebar> {
                     .where((i) => ['Overview', 'System Users', 'System Logs', 'Audit Export', 'Reports', 'Clinician Management', 'Data Source', 'Generate Analytics', 'Analytics Dashboard'].contains(i.label))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
 
-                // Insights group — DHO only
-                if (widget.role == UserRole.dho) ...[
+                // Insights group — Admin only
+                if (widget.role == UserRole.admin) ...[
                   _GroupHeader(
                     label: 'Insights',
                     icon: Icons.insights_rounded,
@@ -156,8 +156,8 @@ class _AppSidebarState extends State<AppSidebar> {
                   ),
                 ],
 
-                // Activity Logs group — DHO only
-                if (widget.role == UserRole.dho) ...[
+                // Activity Logs group — Admin only
+                if (widget.role == UserRole.admin) ...[
                   _GroupHeader(
                     label: 'Activity Logs',
                     icon: Icons.history_rounded,
@@ -184,7 +184,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 // Remaining flat items
                 ..._flatItems
                     .where((i) => i.allowedRoles.contains(widget.role))
-                    .where((i) => ['Reports'].contains(i.label))
+                    .where((i) => <String>[].contains(i.label))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
               ],
             ),

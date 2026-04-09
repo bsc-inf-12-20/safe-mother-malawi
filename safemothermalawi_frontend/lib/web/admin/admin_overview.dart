@@ -11,6 +11,11 @@ import 'system_users.dart';
 import 'reports_screen.dart';
 import 'system_logs.dart';
 import 'audit_export.dart';
+import 'ivr_insights.dart';
+import 'question_insights.dart';
+import 'task_analytics.dart';
+import 'insights_screen.dart';
+import 'activity_logs_screen.dart';
 
 class AdminOverview extends StatefulWidget {
   const AdminOverview({super.key});
@@ -34,6 +39,16 @@ class _AdminOverviewState extends State<AdminOverview> {
         return const SystemLogs();
       case '/audit-export':
         return const AuditExport();
+      case '/ivr-insights':
+        return const IvrInsights();
+      case '/question-insights':
+        return const QuestionInsights();
+      case '/insights':
+        return const InsightsScreen();
+      case '/task-analytics':
+        return const TaskAnalytics();
+      case '/activity-logs':
+        return const ActivityLogsScreen();
       case '/reports':
         return const ReportsScreen();
       default:
@@ -47,6 +62,11 @@ class _AdminOverviewState extends State<AdminOverview> {
       '/clinicians': 'System Users',
       '/system-logs': 'System Logs',
       '/audit-export': 'Audit Export',
+      '/ivr-insights': 'IVR Insights',
+      '/question-insights': 'Question Insights',
+      '/insights': 'Insights',
+      '/task-analytics': 'Task Analytics',
+      '/activity-logs': 'Activity Logs',
       '/reports': 'Reports',
     };
     return titles[_currentRoute] ?? 'Admin Dashboard';
