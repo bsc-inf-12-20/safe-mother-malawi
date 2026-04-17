@@ -422,7 +422,7 @@ class _AddClinicianFormState extends State<_AddClinicianForm> {
               _DropField(
                 label: 'Role',
                 value: _role,
-                items: const ['Clinician', 'Midwife', 'CHW'],
+                items: const ['Clinician'],
                 onChanged: (v) => setState(() => _role = v!),
               ),
             ],
