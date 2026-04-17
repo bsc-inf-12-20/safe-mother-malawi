@@ -14,6 +14,7 @@ class _ClinicianManagementState extends State<ClinicianManagement> {
   final _searchCtrl = TextEditingController();
   String _filterStatus = 'All';
   bool _showForm = false;
+  Map<String, dynamic>? _editingClinician;
 
   final List<Map<String, dynamic>> _clinicians = [
     {'name': 'Dr. Chisomo Banda', 'district': 'Blantyre', 'facility': 'Queen Elizabeth Central', 'role': 'Clinician', 'status': 'Active', 'lastActive': '2h ago'},
@@ -75,6 +76,19 @@ class _ClinicianManagementState extends State<ClinicianManagement> {
                 _showForm = false;
               }),
               onCancel: () => setState(() => _showForm = false),
+            ),
+            const SizedBox(height: 20),
+          ],
+
+          // Edit form (collapsible)
+          if (_editingClinician != null) ...[
+            _EditClinicianForm(
+              clinician: _editingClinician!,
+              onSubmit: (data) => setState(() {
+                _editingClinician!.addAll(data);
+                _editingClinician = null;
+              }),
+              onCancel: () => setState(() => _editingClinician = null),
             ),
             const SizedBox(height: 20),
           ],
@@ -237,7 +251,10 @@ class _ClinicianManagementState extends State<ClinicianManagement> {
                                               icon: Icons.edit_outlined,
                                               color: AppColors.primary,
                                               tooltip: 'Edit',
-                                              onTap: () {},
+                                              onTap: () => setState(() {
+                                                _showForm = false;
+                                                _editingClinician = c;
+                                              }),
                                             ),
                                             const SizedBox(width: 4),
                                             _ActionBtn(
@@ -518,6 +535,106 @@ class _DropField extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             ),
             items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Edit Clinician Form ──────────────────────────────────────────────────────
+
+class _EditClinicianForm extends StatefulWidget {
+  final Map<String, dynamic> clinician;
+  final ValueChanged<Map<String, dynamic>> onSubmit;
+  final VoidCallback onCancel;
+  const _EditClinicianForm({required this.clinician, required this.onSubmit, required this.onCancel});
+
+  @override
+  State<_EditClinicianForm> createState() => _EditClinicianFormState();
+}
+
+class _EditClinicianFormState extends State<_EditClinicianForm> {
+  late final TextEditingController _name;
+  late final TextEditingController _contact;
+  late final TextEditingController _facility;
+  late String _role;
+
+  @override
+  void initState() {
+    super.initState();
+    _name     = TextEditingController(text: widget.clinician['name'] ?? '');
+    _contact  = TextEditingController(text: widget.clinician['contact'] ?? '');
+    _facility = TextEditingController(text: widget.clinician['facility'] ?? '');
+    _role     = widget.clinician['role'] ?? 'Clinician';
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _contact.dispose();
+    _facility.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.4), width: 1.5),
+        boxShadow: const [BoxShadow(color: AppColors.shadowColor, blurRadius: 24, offset: Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.edit_rounded, size: 16, color: AppColors.accent),
+              const SizedBox(width: 8),
+              Text('Edit Clinician',
+                  style: GoogleFonts.publicSans(
+                      fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.headings)),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              _FormField(label: 'Full Name', controller: _name, hint: 'Dr. John Doe'),
+              _FormField(label: 'Contact', controller: _contact, hint: '+265 999 000 000'),
+              _FormField(label: 'Facility', controller: _facility, hint: 'Health facility name'),
+              _DropField(
+                label: 'Role',
+                value: _role,
+                items: const ['Clinician'],
+                onChanged: (v) => setState(() => _role = v!),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _GradientButton(
+                label: 'Save Changes',
+                icon: Icons.save_rounded,
+                onTap: () => widget.onSubmit({
+                  'name':     _name.text.isEmpty ? widget.clinician['name'] : _name.text,
+                  'contact':  _contact.text,
+                  'facility': _facility.text.isEmpty ? widget.clinician['facility'] : _facility.text,
+                  'role':     _role,
+                }),
+              ),
+              const SizedBox(width: 12),
+              TextButton(
+                onPressed: widget.onCancel,
+                child: Text('Cancel',
+                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.mutedText)),
+              ),
+            ],
           ),
         ],
       ),
