@@ -198,7 +198,7 @@ class _ClinicianManagementState extends State<ClinicianManagement> {
                                       ),
                                       Expanded(
                                         flex: 3,
-                                        child: Text(c['district'],
+                                        child: Text(c['district'] ?? '—',
                                             style: GoogleFonts.inter(
                                                 fontSize: 13, color: AppColors.bodyText)),
                                       ),
@@ -396,7 +396,6 @@ class _AddClinicianFormState extends State<_AddClinicianForm> {
   final _name = TextEditingController();
   final _contact = TextEditingController();
   final _facility = TextEditingController();
-  String _role = 'Clinician';
 
   @override
   void dispose() {
@@ -429,12 +428,6 @@ class _AddClinicianFormState extends State<_AddClinicianForm> {
               _FormField(label: 'Full Name', controller: _name, hint: 'Dr. John Doe'),
               _FormField(label: 'Contact', controller: _contact, hint: '+265 999 000 000'),
               _FormField(label: 'Facility', controller: _facility, hint: 'Health facility name'),
-              _DropField(
-                label: 'Role',
-                value: _role,
-                items: const ['Clinician'],
-                onChanged: (v) => setState(() => _role = v!),
-              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -445,8 +438,9 @@ class _AddClinicianFormState extends State<_AddClinicianForm> {
                 icon: Icons.save_rounded,
                 onTap: () => widget.onSubmit({
                   'name': _name.text.isEmpty ? 'New Clinician' : _name.text,
+                  'contact': _contact.text,
                   'facility': _facility.text.isEmpty ? 'N/A' : _facility.text,
-                  'role': _role,
+                  'role': 'Clinician',
                   'status': 'Active',
                 }),
               ),
@@ -504,46 +498,7 @@ class _FormField extends StatelessWidget {
   }
 }
 
-class _DropField extends StatelessWidget {
-  final String label;
-  final String value;
-  final List<String> items;
-  final ValueChanged<String?> onChanged;
-  const _DropField({required this.label, required this.value, required this.items, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 220,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label.toUpperCase(),
-              style: GoogleFonts.inter(
-                  fontSize: 11, fontWeight: FontWeight.w600,
-                  color: AppColors.mutedText, letterSpacing: 0.8)),
-          const SizedBox(height: 6),
-          DropdownButtonFormField<String>(
-            initialValue: value,
-            onChanged: onChanged,
-            style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurface),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: AppColors.surfaceContainerHighest,
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            ),
-            items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ── Edit Clinician Form ──────────────────────────────────────────────────────
-
 class _EditClinicianForm extends StatefulWidget {
   final Map<String, dynamic> clinician;
   final ValueChanged<Map<String, dynamic>> onSubmit;
@@ -558,7 +513,6 @@ class _EditClinicianFormState extends State<_EditClinicianForm> {
   late final TextEditingController _name;
   late final TextEditingController _contact;
   late final TextEditingController _facility;
-  late String _role;
 
   @override
   void initState() {
@@ -566,7 +520,6 @@ class _EditClinicianFormState extends State<_EditClinicianForm> {
     _name     = TextEditingController(text: widget.clinician['name'] ?? '');
     _contact  = TextEditingController(text: widget.clinician['contact'] ?? '');
     _facility = TextEditingController(text: widget.clinician['facility'] ?? '');
-    _role     = widget.clinician['role'] ?? 'Clinician';
   }
 
   @override
@@ -607,12 +560,6 @@ class _EditClinicianFormState extends State<_EditClinicianForm> {
               _FormField(label: 'Full Name', controller: _name, hint: 'Dr. John Doe'),
               _FormField(label: 'Contact', controller: _contact, hint: '+265 999 000 000'),
               _FormField(label: 'Facility', controller: _facility, hint: 'Health facility name'),
-              _DropField(
-                label: 'Role',
-                value: _role,
-                items: const ['Clinician'],
-                onChanged: (v) => setState(() => _role = v!),
-              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -625,7 +572,7 @@ class _EditClinicianFormState extends State<_EditClinicianForm> {
                   'name':     _name.text.isEmpty ? widget.clinician['name'] : _name.text,
                   'contact':  _contact.text,
                   'facility': _facility.text.isEmpty ? widget.clinician['facility'] : _facility.text,
-                  'role':     _role,
+                  'role':     widget.clinician['role'] ?? 'Clinician',
                 }),
               ),
               const SizedBox(width: 12),
