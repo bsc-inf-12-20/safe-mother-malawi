@@ -128,7 +128,8 @@ class _AppSidebarState extends State<AppSidebar> {
                 // Flat items before groups
                 ..._flatItems
                     .where((i) => i.allowedRoles.contains(widget.role))
-                    .where((i) => ['Overview', 'System Users', 'Audit Export', 'Reports', 'Clinician Management', 'Data Source', 'Generate Analytics', 'Analytics Dashboard'].contains(i.label))
+                    .where((i) => ['Overview', 'System Users', 'Audit Export', 'Clinician Management', 'Data Source', 'Generate Analytics', 'Analytics Dashboard', 'Reports'].contains(i.label))
+                    .where((i) => !(widget.role == UserRole.admin && i.label == 'Reports'))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
 
                 // Insights group — Admin only
@@ -185,6 +186,12 @@ class _AppSidebarState extends State<AppSidebar> {
                     .where((i) => i.allowedRoles.contains(widget.role))
                     .where((i) => <String>[].contains(i.label))
                     .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
+
+                // Reports at the bottom — Admin only
+                if (widget.role == UserRole.admin)
+                  ..._flatItems
+                      .where((i) => i.label == 'Reports' && i.allowedRoles.contains(UserRole.admin))
+                      .map((i) => _NavTile(item: i, isActive: widget.currentRoute == i.route, onTap: () => widget.onNavigate(i.route))),
               ],
             ),
           ),
