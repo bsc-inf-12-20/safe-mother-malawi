@@ -15,6 +15,7 @@ class _SystemUsersState extends State<SystemUsers> {
   String _filterRole = 'All';
   String _filterStatus = 'All';
   bool _showForm = false;
+  Map<String, dynamic>? _editingUser;
 
   final List<Map<String, dynamic>> _users = [
     // Admins
@@ -88,6 +89,19 @@ class _SystemUsersState extends State<SystemUsers> {
                 _showForm = false;
               }),
               onCancel: () => setState(() => _showForm = false),
+            ),
+            const SizedBox(height: 20),
+          ],
+
+          // Edit form
+          if (_editingUser != null) ...[
+            _EditUserForm(
+              user: _editingUser!,
+              onSubmit: (data) => setState(() {
+                _editingUser!.addAll(data);
+                _editingUser = null;
+              }),
+              onCancel: () => setState(() => _editingUser = null),
             ),
             const SizedBox(height: 20),
           ],
@@ -182,7 +196,10 @@ class _SystemUsersState extends State<SystemUsers> {
                                               onTap: () => setState(() => u['status'] = isActive ? 'Inactive' : 'Active'),
                                             ),
                                             const SizedBox(width: 4),
-                                            _ActionBtn(icon: Icons.edit_outlined, color: AppColors.primary, tooltip: 'Edit', onTap: () {}),
+                                            _ActionBtn(icon: Icons.edit_outlined, color: AppColors.primary, tooltip: 'Edit', onTap: () => setState(() {
+                                              _showForm = false;
+                                              _editingUser = u;
+                                            })),
                                             const SizedBox(width: 4),
                                             _ActionBtn(icon: Icons.delete_outline_rounded, color: AppColors.criticalText, tooltip: 'Delete', onTap: () => setState(() => _users.remove(u))),
                                           ],
@@ -415,6 +432,115 @@ class _Drop extends StatelessWidget {
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12)),
           items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList()),
       ]),
+    );
+  }
+}
+
+// ── Edit User Form ───────────────────────────────────────────────────────────
+
+class _EditUserForm extends StatefulWidget {
+  final Map<String, dynamic> user;
+  final ValueChanged<Map<String, dynamic>> onSubmit;
+  final VoidCallback onCancel;
+  const _EditUserForm({required this.user, required this.onSubmit, required this.onCancel});
+
+  @override
+  State<_EditUserForm> createState() => _EditUserFormState();
+}
+
+class _EditUserFormState extends State<_EditUserForm> {
+  late final TextEditingController _name;
+  late final TextEditingController _email;
+  late final TextEditingController _facility;
+  late String _district;
+  late String _role;
+
+  @override
+  void initState() {
+    super.initState();
+    _name     = TextEditingController(text: widget.user['name'] ?? '');
+    _email    = TextEditingController(text: widget.user['email'] ?? '');
+    _facility = TextEditingController(text: widget.user['facility'] ?? '');
+    _district = widget.user['district'] ?? 'Blantyre';
+    _role     = widget.user['role'] ?? 'Clinician';
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _facility.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.4), width: 1.5),
+        boxShadow: const [BoxShadow(color: AppColors.shadowColor, blurRadius: 24, offset: Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.edit_rounded, size: 16, color: AppColors.accent),
+              const SizedBox(width: 8),
+              Text('Edit User',
+                  style: GoogleFonts.publicSans(
+                      fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.headings)),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              _Field(label: 'Full Name', ctrl: _name, hint: 'Dr. John Doe'),
+              _Field(label: 'Email', ctrl: _email, hint: 'user@moh.gov.mw'),
+              _Field(label: 'Facility', ctrl: _facility, hint: 'Health facility name'),
+              _Drop(
+                label: 'District',
+                value: _district,
+                items: const ['National', 'Blantyre', 'Lilongwe', 'Mzuzu', 'Zomba', 'Mangochi', 'Kasungu', 'Salima', 'Karonga', 'Dedza', 'Ntcheu', 'Thyolo'],
+                onChanged: (v) => setState(() => _district = v!),
+              ),
+              _Drop(
+                label: 'Role',
+                value: _role,
+                items: const ['Admin', 'DHO', 'Clinician', 'Midwife', 'CHW'],
+                onChanged: (v) => setState(() => _role = v!),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _GradientBtn(
+                label: 'Save Changes',
+                icon: Icons.save_rounded,
+                onTap: () => widget.onSubmit({
+                  'name':     _name.text.isEmpty ? widget.user['name'] : _name.text,
+                  'email':    _email.text.isEmpty ? widget.user['email'] : _email.text,
+                  'facility': _facility.text.isEmpty ? widget.user['facility'] : _facility.text,
+                  'district': _district,
+                  'role':     _role,
+                }),
+              ),
+              const SizedBox(width: 12),
+              TextButton(
+                onPressed: widget.onCancel,
+                child: Text('Cancel',
+                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.mutedText)),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

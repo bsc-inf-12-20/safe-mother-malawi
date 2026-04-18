@@ -86,7 +86,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       builder: (_) => const LoginDialog(),
     );
     if (role == null || !mounted) return;
-    if (role == 'admin') {
+    if (role == 'clinician') {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const ClinicianDashboard()));
+    } else if (role == 'admin') {
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const AdminOverview()));
     } else if (role == 'dho') {
