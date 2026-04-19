@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../auth/services/logout_helper.dart';
+import '../../auth/widgets/app_logo.dart';
 import '../screens/profile_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/help_screen.dart';
@@ -36,13 +37,13 @@ class AppDrawer extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          width: 60, height: 60,
+                          width: 90, height: 90,
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
                           ),
-                          child: const Icon(Icons.pregnant_woman, size: 32, color: Colors.white),
+                          child: const AppLogo(size: 90, darkBackground: true),
                         ),
                         const Spacer(),
                         IconButton(
@@ -158,7 +159,7 @@ class AppDrawer extends StatelessWidget {
                     colors: [AppColors.navbarBg, AppColors.mobileBlue]),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.pregnant_woman, color: Colors.white, size: 36),
+              child: const AppLogo(size: 100, darkBackground: true),
             ),
             const SizedBox(height: 16),
             const Text('Safe Mother Malawi',

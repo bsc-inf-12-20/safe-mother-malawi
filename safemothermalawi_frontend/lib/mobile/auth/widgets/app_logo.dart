@@ -10,15 +10,14 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
-      child: Image.asset(
-        'assets/baby/logo.png',
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) =>
-            _TextLogo(size: size, darkBackground: darkBackground),
-      ),
+    final asset = darkBackground ? 'assets/logo/LOGO5.png' : 'assets/logo/LOGO6.png';
+    return Image.asset(
+      asset,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      errorBuilder: (_, _, _) =>
+          _TextLogo(size: size, darkBackground: darkBackground),
     );
   }
 }

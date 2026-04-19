@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../auth/services/logout_helper.dart';
+import '../../auth/widgets/app_logo.dart';
 import '../screens/profile_screen.dart';
 import '../screens/notifications_screen.dart';
 import '../screens/nutrition_screen.dart';
@@ -39,9 +40,9 @@ class NeoAppDrawer extends StatelessWidget {
                     Row(
                       children: [
                         const CircleAvatar(
-                          radius: 30,
+                          radius: 50,
                           backgroundColor: Colors.white24,
-                          child: Icon(Icons.child_care, size: 34, color: Colors.white),
+                          child: AppLogo(size: 100, darkBackground: true),
                         ),
                         const Spacer(),
                         IconButton(
@@ -120,7 +121,7 @@ class NeoAppDrawer extends StatelessWidget {
                 gradient: const LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF3949AB)]),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.child_care, color: Colors.white, size: 36),
+              child: const AppLogo(size: 100, darkBackground: true),
             ),
             const SizedBox(height: 16),
             const Text('Safe Mother Malawi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF212121))),

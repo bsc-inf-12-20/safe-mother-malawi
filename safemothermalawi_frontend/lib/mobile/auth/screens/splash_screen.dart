@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import '../services/auth_service.dart';
-import '../widgets/app_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -50,7 +49,12 @@ class _SplashScreenState extends State<SplashScreen>
           Expanded(
             child: Center(
               // Clean circular logo — no container, no shadow, no background
-              child: AppLogo(size: 140, darkBackground: true),
+              child: Image.asset(
+                'assets/logo/LOGO5.png',
+                width: 300,
+                height: 300,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
           Padding(

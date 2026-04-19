@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../auth/services/auth_service.dart';
 import '../auth/services/logout_helper.dart';
+import '../auth/widgets/app_logo.dart';
 import 'models/neonatal_data.dart';
 import 'screens/home_screen.dart';
 import 'screens/schedule_screen.dart';
@@ -156,7 +157,7 @@ class _NeoDrawer extends StatelessWidget {
                 gradient: const LinearGradient(colors: [AppColors.navbarBg, AppColors.mobileBlue]),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.child_care, color: Colors.white, size: 36),
+              child: const AppLogo(size: 100, darkBackground: true),
             ),
             const SizedBox(height: 16),
             const Text('Safe Mother Malawi',
@@ -202,13 +203,13 @@ class _NeoDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 56, height: 56,
+                  width: 90, height: 90,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
                   ),
-                  child: const Icon(Icons.child_care, color: Colors.white, size: 30),
+                  child: const AppLogo(size: 90, darkBackground: true),
                 ),
                 const SizedBox(height: 12),
                 Text(babyName,
