@@ -145,11 +145,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       height: 64, color: _navy,
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Row(children: [
-        Container(
-          width: 40, height: 40,
-          decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-          child: const Icon(Icons.local_hospital, color: _navy, size: 24),
-        ),
+        Image.asset('assets/logo/LOGO5.png', width: 110, height: 110, fit: BoxFit.contain),
         const SizedBox(width: 10),
         const Text('Safe Mother Malawi',
             style: TextStyle(color: Colors.white, fontSize: 18,
@@ -303,7 +299,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
           Container(
             width: 260, height: 260,
             decoration: BoxDecoration(color: _light, borderRadius: BorderRadius.circular(20)),
-            child: const Icon(Icons.local_hospital, size: 120, color: _navy),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Image.asset('assets/logo/LOGO6.png', fit: BoxFit.contain),
+            ),
           ),
           const SizedBox(width: 64),
           Expanded(

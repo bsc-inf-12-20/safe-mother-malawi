@@ -88,11 +88,7 @@ class _AppSidebarState extends State<AppSidebar> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 36, height: 36,
-                      decoration: BoxDecoration(gradient: AppColors.primaryGradient, borderRadius: BorderRadius.circular(10)),
-                      child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 20),
-                    ),
+                    Image.asset('assets/logo/LOGO5.png', width: 80, height: 80, fit: BoxFit.contain),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text('Safe Mother',
