@@ -1,61 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
-
-// ── Data models ───────────────────────────────────────────────────────────────
-
-enum RiskLevel { low, medium, high }
-
-class PrenatalPatient {
-  final String name, phone, email, nationality, district, zone;
-  final int age;
-  final int pregnancyMonths;
-  final String edd;
-  final RiskLevel risk;
-  final String bp;
-  final List<String> symptoms;
-
-  const PrenatalPatient({
-    required this.name, required this.age, required this.phone,
-    required this.email, required this.nationality, required this.district,
-    required this.zone, required this.pregnancyMonths, required this.edd,
-    required this.risk, required this.bp, required this.symptoms,
-  });
-}
-
-class NeonatalPatient {
-  final String name, phone, email, nationality, district, zone;
-  final int age;
-  final String babyName, babyDob, babyGender, babyAge;
-  final RiskLevel risk;
-  final String bp;
-  final List<String> symptoms;
-
-  const NeonatalPatient({
-    required this.name, required this.age, required this.phone,
-    required this.email, required this.nationality, required this.district,
-    required this.zone, required this.babyName, required this.babyDob,
-    required this.babyGender, required this.babyAge,
-    required this.risk, required this.bp, required this.symptoms,
-  });
-}
-
-// ── Sample data ───────────────────────────────────────────────────────────────
-
-const _prenatal = [
-  PrenatalPatient(name: 'Grace Banda',    age: 28, phone: '+265 991 234 567', email: 'grace@mail.com',   nationality: 'Malawian', district: 'Zomba',    zone: 'Zomba Central HC',    pregnancyMonths: 7, edd: '15 Jun 2026', risk: RiskLevel.high,   bp: '148/96',  symptoms: ['Severe headache', 'Reduced fetal movement']),
-  PrenatalPatient(name: 'Faith Mwale',    age: 22, phone: '+265 888 345 678', email: '',                 nationality: 'Malawian', district: 'Blantyre', zone: 'Queen Elizabeth HC',  pregnancyMonths: 8, edd: '02 May 2026', risk: RiskLevel.high,   bp: '152/98',  symptoms: ['Oedema', 'Proteinuria']),
-  PrenatalPatient(name: 'Liness Kachali', age: 31, phone: '+265 999 456 789', email: 'liness@mail.com', nationality: 'Malawian', district: 'Lilongwe', zone: 'Area 18 HC',          pregnancyMonths: 7, edd: '20 Jun 2026', risk: RiskLevel.medium, bp: '126/84',  symptoms: ['Gestational diabetes', 'Fatigue']),
-  PrenatalPatient(name: 'Aisha Tembo',    age: 19, phone: '+265 881 567 890', email: '',                 nationality: 'Malawian', district: 'Mzuzu',    zone: 'Mzuzu City HC',       pregnancyMonths: 4, edd: '10 Sep 2026', risk: RiskLevel.low,    bp: '110/70',  symptoms: ['Mild nausea']),
-  PrenatalPatient(name: 'Joyce Mwale',    age: 40, phone: '+265 992 678 901', email: 'joyce@mail.com',  nationality: 'Malawian', district: 'Dedza',    zone: 'Dedza District HC',   pregnancyMonths: 6, edd: '30 Jul 2026', risk: RiskLevel.medium, bp: '125/80',  symptoms: ['Fatigue', 'Back pain']),
-];
-
-const _neonatal = [
-  NeonatalPatient(name: 'Mercy Tembo',   age: 26, phone: '+265 993 111 222', email: 'mercy@mail.com', nationality: 'Malawian', district: 'Zomba',    zone: 'Zomba Central HC',  babyName: 'Baby Tembo',   babyDob: '18 Mar 2026', babyGender: 'Female', babyAge: '8 days',   risk: RiskLevel.medium, bp: '118/78', symptoms: ['Mild fever 37.9°C', 'Breast tenderness']),
-  NeonatalPatient(name: 'Rose Phiri',    age: 24, phone: '+265 994 222 333', email: '',               nationality: 'Malawian', district: 'Blantyre', zone: 'Queen Elizabeth HC', babyName: 'Baby Phiri',   babyDob: '12 Mar 2026', babyGender: 'Male',   babyAge: '14 days',  risk: RiskLevel.low,    bp: '112/72', symptoms: []),
-  NeonatalPatient(name: 'Fatima Chirwa', age: 19, phone: '+265 995 333 444', email: '',               nationality: 'Malawian', district: 'Lilongwe', zone: 'Area 18 HC',         babyName: 'Baby Chirwa',  babyDob: '20 Mar 2026', babyGender: 'Female', babyAge: '6 days',   risk: RiskLevel.low,    bp: '115/75', symptoms: []),
-];
-
-// ── Page ──────────────────────────────────────────────────────────────────────
+import '../../../services/api_service.dart';
 
 class ClinicianPatientsPage extends StatefulWidget {
   const ClinicianPatientsPage({super.key});
@@ -65,50 +10,263 @@ class ClinicianPatientsPage extends StatefulWidget {
 
 class _ClinicianPatientsPageState extends State<ClinicianPatientsPage> {
   final _search = TextEditingController();
-  String _filter = 'All'; // All | Prenatal | Neonatal
-  Object? _selected;
+  String _filter = 'All';
+  Map<String, dynamic>? _selected;
+  String _selectedType = '';
+
+  List<Map<String, dynamic>> _prenatal = [];
+  List<Map<String, dynamic>> _neonatal = [];
+  List<dynamic> _history = [];
+  bool _loading = true;
+  bool _historyLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _selected = null;
-  }
+  void initState() { super.initState(); _load(); }
 
   @override
-  void dispose() {
-    _search.dispose();
-    super.dispose();
+  void dispose() { _search.dispose(); super.dispose(); }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final results = await Future.wait([
+        ApiService.getPrenatalPatients(),
+        ApiService.getNeonatalPatients(),
+      ]);
+      setState(() {
+        _prenatal = results[0].cast<Map<String, dynamic>>();
+        _neonatal = results[1].cast<Map<String, dynamic>>();
+        _loading = false;
+      });
+    } catch (_) { setState(() => _loading = false); }
   }
 
-  // Combined filtered list — all patients, filtered by search + type
-  List<Object> get _filteredAll {
+  Future<void> _loadHistory(String patientId) async {
+    setState(() { _historyLoading = true; _history = []; });
+    try {
+      final data = await ApiService.getPatientHistory(patientId);
+      setState(() { _history = (data['riskHistory'] as List?) ?? []; _historyLoading = false; });
+    } catch (_) { setState(() => _historyLoading = false); }
+  }
+
+  List<Map<String, dynamic>> get _filteredAll {
     final q = _search.text.toLowerCase();
-    final List<Object> result = [];
-    for (final p in _prenatal) {
-      if (_filter == 'Neonatal') continue;
-      if (q.isNotEmpty && !p.name.toLowerCase().contains(q)) continue;
-      result.add(p);
+    final result = <Map<String, dynamic>>[];
+    if (_filter != 'Neonatal') {
+      for (final p in _prenatal) {
+        if (q.isNotEmpty && !(p['fullName'] ?? '').toLowerCase().contains(q)) continue;
+        result.add({...p, '_type': 'prenatal'});
+      }
     }
-    for (final p in _neonatal) {
-      if (_filter == 'Prenatal') continue;
-      if (q.isNotEmpty && !p.name.toLowerCase().contains(q)) continue;
-      result.add(p);
+    if (_filter != 'Prenatal') {
+      for (final p in _neonatal) {
+        if (q.isNotEmpty && !(p['motherName'] ?? '').toLowerCase().contains(q)) continue;
+        result.add({...p, '_type': 'neonatal'});
+      }
     }
     return result;
   }
 
+  // â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  Future<void> _confirmDelete(Map<String, dynamic> p) async {
+    final isPrenatal = p['_type'] == 'prenatal';
+    final name = isPrenatal ? (p['fullName'] ?? '') : (p['motherName'] ?? '');
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Row(children: [
+          Icon(Icons.delete_outline_rounded, color: Colors.red, size: 20),
+          SizedBox(width: 8),
+          Text('Delete Patient', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ]),
+        content: Text('Delete "$name"? This cannot be undone.',
+            style: const TextStyle(fontSize: 13, color: Colors.black54)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, elevation: 0),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      if (isPrenatal) {
+        await ApiService.deletePrenatalPatient(p['id']);
+        setState(() { _prenatal.removeWhere((x) => x['id'] == p['id']); if (_selected?['id'] == p['id']) _selected = null; });
+      } else {
+        await ApiService.deleteNeonatalPatient(p['id']);
+        setState(() { _neonatal.removeWhere((x) => x['id'] == p['id']); if (_selected?['id'] == p['id']) _selected = null; });
+      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('"$name" deleted.'), backgroundColor: AppColors.green));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+    }
+  }
+
+  // â”€â”€ Edit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  void _showEditDialog(Map<String, dynamic> p) {
+    final isPrenatal = p['_type'] == 'prenatal';
+    if (isPrenatal) {
+      _showEditPrenatal(p);
+    } else {
+      _showEditNeonatal(p);
+    }
+  }
+
+  void _showEditPrenatal(Map<String, dynamic> p) {
+    final nameCtrl  = TextEditingController(text: p['fullName'] ?? '');
+    final phoneCtrl = TextEditingController(text: p['phone'] ?? '');
+    final emailCtrl = TextEditingController(text: p['email'] ?? '');
+    final monthsCtrl = TextEditingController(text: p['pregnancyMonths'] ?? '');
+    bool saving = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setS) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Row(children: [
+          Icon(Icons.edit_outlined, color: AppColors.navy, size: 20),
+          SizedBox(width: 8),
+          Text('Edit Prenatal Patient', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        ]),
+        content: SizedBox(width: 400, child: Column(mainAxisSize: MainAxisSize.min, children: [
+          _editField('Full Name', nameCtrl),
+          const SizedBox(height: 12),
+          _editField('Phone', phoneCtrl, keyboard: TextInputType.phone),
+          const SizedBox(height: 12),
+          _editField('Email', emailCtrl, keyboard: TextInputType.emailAddress),
+          const SizedBox(height: 12),
+          _editField('Pregnancy Months', monthsCtrl, keyboard: TextInputType.number),
+        ])),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: saving ? null : () async {
+              setS(() => saving = true);
+              try {
+                final updated = await ApiService.updatePrenatalPatient(p['id'], {
+                  'fullName': nameCtrl.text.trim(),
+                  'phone': phoneCtrl.text.trim(),
+                  'email': emailCtrl.text.trim(),
+                  'pregnancyMonths': monthsCtrl.text.trim(),
+                });
+                setState(() {
+                  final idx = _prenatal.indexWhere((x) => x['id'] == p['id']);
+                  if (idx != -1) _prenatal[idx] = updated;
+                  if (_selected?['id'] == p['id']) _selected = {...updated, '_type': 'prenatal'};
+                });
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Patient updated.'), backgroundColor: AppColors.green));
+              } catch (e) {
+                setS(() => saving = false);
+                if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.navy, foregroundColor: Colors.white, elevation: 0),
+            child: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Text('Save'),
+          ),
+        ],
+      )),
+    );
+  }
+
+  void _showEditNeonatal(Map<String, dynamic> p) {
+    final mNameCtrl  = TextEditingController(text: p['motherName'] ?? '');
+    final mPhoneCtrl = TextEditingController(text: p['motherPhone'] ?? '');
+    final bNameCtrl  = TextEditingController(text: p['babyName'] ?? '');
+    final bWeightCtrl = TextEditingController(text: p['babyBirthWeight'] ?? '');
+    bool saving = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setS) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Row(children: [
+          Icon(Icons.edit_outlined, color: AppColors.navy, size: 20),
+          SizedBox(width: 8),
+          Text('Edit Neonatal Patient', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        ]),
+        content: SizedBox(width: 400, child: Column(mainAxisSize: MainAxisSize.min, children: [
+          _editField('Mother Name', mNameCtrl),
+          const SizedBox(height: 12),
+          _editField('Mother Phone', mPhoneCtrl, keyboard: TextInputType.phone),
+          const SizedBox(height: 12),
+          _editField('Baby Name', bNameCtrl),
+          const SizedBox(height: 12),
+          _editField('Birth Weight (kg)', bWeightCtrl, keyboard: TextInputType.number),
+        ])),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: saving ? null : () async {
+              setS(() => saving = true);
+              try {
+                final updated = await ApiService.updateNeonatalPatient(p['id'], {
+                  'motherName': mNameCtrl.text.trim(),
+                  'motherPhone': mPhoneCtrl.text.trim(),
+                  'babyName': bNameCtrl.text.trim(),
+                  'babyBirthWeight': bWeightCtrl.text.trim(),
+                });
+                setState(() {
+                  final idx = _neonatal.indexWhere((x) => x['id'] == p['id']);
+                  if (idx != -1) _neonatal[idx] = updated;
+                  if (_selected?['id'] == p['id']) _selected = {...updated, '_type': 'neonatal'};
+                });
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Patient updated.'), backgroundColor: AppColors.green));
+              } catch (e) {
+                setS(() => saving = false);
+                if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(
+                    SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.navy, foregroundColor: Colors.white, elevation: 0),
+            child: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Text('Save'),
+          ),
+        ],
+      )),
+    );
+  }
+
+  Widget _editField(String label, TextEditingController ctrl, {TextInputType keyboard = TextInputType.text}) {
+    return TextField(
+      controller: ctrl, keyboardType: keyboard,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true, fillColor: const Color(0xFFF8FAFC),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.g200)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.g200)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.navy, width: 1.5)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      ),
+    );
+  }
+
+  // â”€â”€ Build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
   @override
   Widget build(BuildContext context) {
+    if (_loading) return const Center(child: CircularProgressIndicator());
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _buildHeader(),
         const SizedBox(height: 20),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(
-            flex: _selected == null ? 1 : 2,
-            child: _buildListPanel(),
-          ),
+          Expanded(flex: _selected == null ? 1 : 2, child: _buildListPanel()),
           if (_selected != null) ...[
             const SizedBox(width: 16),
             Expanded(flex: 3, child: _buildDetailPanel()),
@@ -118,577 +276,225 @@ class _ClinicianPatientsPageState extends State<ClinicianPatientsPage> {
     );
   }
 
-  // ── Header ───────────────────────────────────────────────────────────────────
-
-  Widget _buildHeader() {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Icon(Icons.people_outline, color: AppColors.navy, size: 22),
-      const SizedBox(width: 10),
-      const Expanded(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Patients',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.g800)),
-          Text('View and manage all patients under your care.',
-              style: TextStyle(fontSize: 13, color: AppColors.g400)),
-        ]),
-      ),
-    ]);
-  }
-
-  // ── List panel ────────────────────────────────────────────────────────────────
+  Widget _buildHeader() => Row(children: [
+    const Icon(Icons.people_outline, color: AppColors.navy, size: 22), const SizedBox(width: 10),
+    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Patients', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.g800)),
+      Text('View and manage all patients under your care.', style: TextStyle(fontSize: 13, color: AppColors.g400)),
+    ])),
+    IconButton(onPressed: _load, icon: const Icon(Icons.refresh_rounded, color: AppColors.navy, size: 20), tooltip: 'Refresh'),
+  ]);
 
   Widget _buildListPanel() {
     final list = _filteredAll;
     return Container(
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.g200)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.g200)),
       child: Column(children: [
-        // Search + dropdown filter row
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: Row(children: [
-            Expanded(
-              child: TextField(
-                controller: _search,
-                onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
-                  hintText: 'Search patients...',
-                  hintStyle: const TextStyle(fontSize: 12, color: AppColors.g400),
-                  prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.g400),
-                  filled: true, fillColor: AppColors.bg,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: AppColors.bg,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.g200),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _filter,
-                  style: const TextStyle(fontSize: 12, color: AppColors.g800),
-                  icon: const Icon(Icons.filter_list, size: 16, color: AppColors.navy),
-                  items: ['All', 'Prenatal', 'Neonatal']
-                      .map((f) => DropdownMenuItem(value: f, child: Text(f)))
-                      .toList(),
-                  onChanged: (v) => setState(() { _filter = v!; _selected = null; }),
-                ),
-              ),
-            ),
-          ]),
-        ),
+        Padding(padding: const EdgeInsets.fromLTRB(12, 12, 12, 8), child: Row(children: [
+          Expanded(child: TextField(controller: _search, onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(hintText: 'Search patients...', hintStyle: const TextStyle(fontSize: 12, color: AppColors.g400),
+              prefixIcon: const Icon(Icons.search, size: 18, color: AppColors.g400),
+              filled: true, fillColor: AppColors.bg, contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none)))),
+          const SizedBox(width: 10),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(color: AppColors.bg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.g200)),
+            child: DropdownButtonHideUnderline(child: DropdownButton<String>(
+              value: _filter, style: const TextStyle(fontSize: 12, color: AppColors.g800),
+              icon: const Icon(Icons.filter_list, size: 16, color: AppColors.navy),
+              items: ['All','Prenatal','Neonatal'].map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
+              onChanged: (v) => setState(() { _filter = v!; _selected = null; })))),
+        ])),
         const Divider(height: 1, color: AppColors.g200),
-        // Combined list
-        SizedBox(
-          height: 480,
-          child: list.isEmpty
-              ? _emptyState()
-              : ListView.builder(
-                  itemCount: list.length,
-                  itemBuilder: (_, i) {
-                    final item = list[i];
-                    if (item is PrenatalPatient) {
-                      final sel = _selected is PrenatalPatient &&
-                          (_selected as PrenatalPatient).name == item.name;
-                      return _patientTile(
-                        name: item.name, age: item.age,
-                        sub: 'Prenatal · ${item.pregnancyMonths} months',
-                        selected: sel,
-                        onTap: () => setState(() => _selected = item),
-                      );
-                    } else {
-                      final p = item as NeonatalPatient;
-                      final sel = _selected is NeonatalPatient &&
-                          (_selected as NeonatalPatient).name == p.name;
-                      return _patientTile(
-                        name: p.name, age: p.age,
-                        sub: 'Neonatal · ${p.babyAge} old',
-                        selected: sel,
-                        onTap: () => setState(() => _selected = p),
-                      );
-                    }
-                  },
-                ),
-        ),
+        SizedBox(height: 480, child: list.isEmpty
+          ? const Center(child: Padding(padding: EdgeInsets.all(24),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.people_outline, color: AppColors.g200, size: 40),
+                SizedBox(height: 8),
+                Text('No patients found.', style: TextStyle(color: AppColors.g400, fontSize: 13)),
+              ])))
+          : ListView.builder(itemCount: list.length, itemBuilder: (_, i) {
+            final p = list[i];
+            final isPrenatal = p['_type'] == 'prenatal';
+            final name = isPrenatal ? (p['fullName'] ?? '') : (p['motherName'] ?? '');
+            final sub  = isPrenatal
+                ? 'Prenatal Â· ${p['pregnancyMonths'] ?? '?'} months'
+                : 'Neonatal Â· Baby: ${p['babyName'] ?? 'â€”'}';
+            final sel = _selected?['id'] == p['id'];
+            return GestureDetector(
+              onTap: () { setState(() { _selected = p; _selectedType = p['_type']; }); _loadHistory(p['id']); },
+              child: AnimatedContainer(duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                decoration: BoxDecoration(color: sel ? AppColors.navyL : Colors.transparent,
+                    border: const Border(bottom: BorderSide(color: AppColors.g200, width: 0.5))),
+                child: Row(children: [
+                  CircleAvatar(radius: 15, backgroundColor: AppColors.navyL,
+                      child: Text(name.isNotEmpty ? name[0] : '?',
+                          style: const TextStyle(color: AppColors.navy, fontSize: 11, fontWeight: FontWeight.bold))),
+                  const SizedBox(width: 10),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(name.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.g800)),
+                    Text(sub, style: const TextStyle(fontSize: 10, color: AppColors.g400)),
+                  ])),
+                  // Edit button
+                  GestureDetector(
+                    onTap: () => _showEditDialog(p),
+                    child: const Padding(padding: EdgeInsets.all(4),
+                        child: Icon(Icons.edit_outlined, size: 15, color: AppColors.navy)),
+                  ),
+                  const SizedBox(width: 4),
+                  // Delete button
+                  GestureDetector(
+                    onTap: () => _confirmDelete(p),
+                    child: const Padding(padding: EdgeInsets.all(4),
+                        child: Icon(Icons.delete_outline_rounded, size: 15, color: Colors.red)),
+                  ),
+                ])),
+            );
+          })),
       ]),
     );
   }
 
-
-
-  Widget _emptyState() => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text('No patients match the filter.',
-              style: TextStyle(color: AppColors.g400, fontSize: 13)),
-        ),
-      );
-
-  Widget _patientTile({
-    required String name, required int age, required String sub,
-    required bool selected, required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.navyL : Colors.transparent,
-          border: const Border(bottom: BorderSide(color: AppColors.g200, width: 0.5)),
-        ),
-        child: Row(children: [
-          CircleAvatar(
-            radius: 15,
-            backgroundColor: AppColors.navyL,
-            child: Text(name[0], style: const TextStyle(
-                color: AppColors.navy, fontSize: 11, fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(width: 10),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-                color: AppColors.g800)),
-            Text('$age yrs · $sub',
-                style: const TextStyle(fontSize: 10, color: AppColors.g400)),
-          ])),
-        ]),
-      ),
-    );
-  }
-
-  // ── Detail panel ──────────────────────────────────────────────────────────────
-
   Widget _buildDetailPanel() {
-    if (_selected == null) {
-      return Container(
-        height: 400,
-        decoration: BoxDecoration(color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.g200)),
-        child: const Center(child: Text('Select a patient to view details.',
-            style: TextStyle(color: AppColors.g400))),
-      );
-    }
-    if (_selected is PrenatalPatient) return _prenatalDetail(_selected as PrenatalPatient);
-    return _neonatalDetail(_selected as NeonatalPatient);
-  }
+    if (_selected == null) return const SizedBox();
+    final p = _selected!;
+    final isPrenatal = _selectedType == 'prenatal';
 
-  Widget _prenatalDetail(PrenatalPatient p) {
-    final (color, bg, label) = _riskStyle(p.risk);
     return Container(
-      decoration: BoxDecoration(color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.g200)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.g200)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _detailHeader(p.name, p.age, 'Prenatal', color, bg, label, p.risk),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(color: AppColors.navyL, borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
+          child: Row(children: [
+            CircleAvatar(radius: 22, backgroundColor: Colors.white,
+                child: Text(isPrenatal ? (p['fullName'] ?? '?')[0] : (p['motherName'] ?? '?')[0],
+                    style: const TextStyle(color: AppColors.navy, fontSize: 16, fontWeight: FontWeight.bold))),
+            const SizedBox(width: 14),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(isPrenatal ? (p['fullName'] ?? 'â€”') : (p['motherName'] ?? 'â€”'),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.g800)),
+              Text(isPrenatal ? 'Prenatal' : 'Neonatal Â· Baby: ${p['babyName'] ?? 'â€”'}',
+                  style: const TextStyle(fontSize: 12, color: AppColors.g600)),
+            ])),
+            // Edit
+            IconButton(
+              onPressed: () => _showEditDialog(p),
+              icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.navy),
+              tooltip: 'Edit',
+            ),
+            // Delete
+            IconButton(
+              onPressed: () => _confirmDelete(p),
+              icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red),
+              tooltip: 'Delete',
+            ),
+            GestureDetector(onTap: () => setState(() { _selected = null; _history = []; }),
+                child: const Icon(Icons.close, size: 18, color: AppColors.g400)),
+          ])),
+
+        Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (isPrenatal) ...[
             _section('Contact Information', [
-              _row(Icons.phone, 'Phone', p.phone),
-              if (p.email.isNotEmpty) _row(Icons.email_outlined, 'Email', p.email),
-              _row(Icons.flag_outlined, 'Nationality', p.nationality),
+              _row(Icons.phone, 'Phone', p['phone'] ?? 'â€”'),
+              if ((p['email'] ?? '').isNotEmpty) _row(Icons.email_outlined, 'Email', p['email']),
+              if ((p['nationality'] ?? '').isNotEmpty) _row(Icons.flag_outlined, 'Nationality', p['nationality']),
             ]),
             const SizedBox(height: 16),
             _section('Location', [
-              _row(Icons.location_on_outlined, 'District', p.district),
-              _row(Icons.local_hospital_outlined, 'Health Centre / Zone', p.zone),
+              _row(Icons.location_on_outlined, 'District', p['district'] ?? 'â€”'),
+              _row(Icons.local_hospital_outlined, 'Health Centre', p['healthCentre'] ?? 'â€”'),
             ]),
             const SizedBox(height: 16),
             _section('Pregnancy Details', [
-              _row(Icons.pregnant_woman, 'Pregnancy Duration', '${p.pregnancyMonths} months'),
-              _row(Icons.calendar_today_outlined, 'Expected Delivery Date', p.edd),
+              _row(Icons.pregnant_woman, 'Duration', '${p['pregnancyMonths'] ?? '?'} months ${p['pregnancyWeeks'] ?? ''} weeks'),
+              if ((p['expectedDeliveryDate'] ?? '').isNotEmpty)
+                _row(Icons.calendar_today_outlined, 'Expected Delivery', p['expectedDeliveryDate']),
             ]),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _showHistory(context, p.name, p.symptoms, p.risk),
-                icon: const Icon(Icons.history, size: 16),
-                label: const Text('View Patient History'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.navy,
-                  side: const BorderSide(color: AppColors.navy),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-            ),
-          ]),
-        ),
-      ]),
-    );
-  }
-
-  Widget _neonatalDetail(NeonatalPatient p) {
-    final (color, bg, label) = _riskStyle(p.risk);
-    return Container(
-      decoration: BoxDecoration(color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.g200)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _detailHeader(p.name, p.age, 'Neonatal', color, bg, label, p.risk),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          ] else ...[
             _section('Mother Details', [
-              _row(Icons.phone, 'Phone', p.phone),
-              if (p.email.isNotEmpty) _row(Icons.email_outlined, 'Email', p.email),
-              _row(Icons.flag_outlined, 'Nationality', p.nationality),
-              _row(Icons.location_on_outlined, 'District', p.district),
-              _row(Icons.place_outlined, 'Zone', p.zone),
+              _row(Icons.phone, 'Phone', p['motherPhone'] ?? 'â€”'),
+              if ((p['motherEmail'] ?? '').isNotEmpty) _row(Icons.email_outlined, 'Email', p['motherEmail']),
+              _row(Icons.location_on_outlined, 'District', p['district'] ?? 'â€”'),
+              _row(Icons.local_hospital_outlined, 'Health Centre', p['healthCentre'] ?? 'â€”'),
             ]),
             const SizedBox(height: 16),
             _section('Baby Details', [
-              _row(Icons.child_friendly_outlined, 'Baby Name', p.babyName),
-              _row(Icons.cake_outlined, 'Date of Birth', p.babyDob),
-              _row(Icons.wc_outlined, 'Gender', p.babyGender),
-              _row(Icons.timelapse_outlined, 'Baby Age', p.babyAge),
+              _row(Icons.child_friendly_outlined, 'Baby Name', p['babyName'] ?? 'â€”'),
+              _row(Icons.cake_outlined, 'Date of Birth', p['babyDob'] ?? 'â€”'),
+              if ((p['babyGender'] ?? '').isNotEmpty) _row(Icons.wc_outlined, 'Gender', p['babyGender']),
+              if ((p['babyBirthWeight'] ?? '').isNotEmpty) _row(Icons.monitor_weight_outlined, 'Birth Weight', '${p['babyBirthWeight']} kg'),
             ]),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _showHistory(context, p.name, p.symptoms, p.risk),
-                icon: const Icon(Icons.history, size: 16),
-                label: const Text('View Patient History'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.navy,
-                  side: const BorderSide(color: AppColors.navy),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-            ),
-          ]),
-        ),
-      ]),
-    );
-  }
-
-  Widget _detailHeader(String name, int age, String status,
-      Color riskColor, Color riskBg, String riskLabel, RiskLevel risk) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: AppColors.navyL, // consistent for all risk levels
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-      ),
-      child: Row(children: [
-        CircleAvatar(
-          radius: 22,
-          backgroundColor: Colors.white,
-          child: Text(name[0], style: const TextStyle(
-              color: AppColors.navy, fontSize: 16, fontWeight: FontWeight.bold)),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold,
-              color: AppColors.g800)),
-          Text('$age years old · $status',
-              style: const TextStyle(fontSize: 12, color: AppColors.g600)),
+          ],
+          const SizedBox(height: 20),
+          SizedBox(width: double.infinity, child: OutlinedButton.icon(
+            onPressed: () => _showHistory(context),
+            icon: const Icon(Icons.history, size: 16),
+            label: const Text('View Patient History'),
+            style: OutlinedButton.styleFrom(foregroundColor: AppColors.navy,
+                side: const BorderSide(color: AppColors.navy), padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+          )),
         ])),
-        GestureDetector(
-          onTap: () => setState(() => _selected = null),
-          child: const Icon(Icons.close, size: 18, color: AppColors.g400),
-        ),
       ]),
     );
   }
 
-  Widget _alertBanner(String msg, Color color, Color bg) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3))),
-      child: Row(children: [
-        Icon(Icons.warning_amber_rounded, color: color, size: 16),
-        const SizedBox(width: 8),
-        Expanded(child: Text(msg,
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color))),
-      ]),
-    );
+  void _showHistory(BuildContext context) {
+    showDialog(context: context, builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520, maxHeight: 560),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(color: AppColors.navyL, borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+            child: Row(children: [
+              const Icon(Icons.history, color: AppColors.navy, size: 20), const SizedBox(width: 10),
+              const Expanded(child: Text('Patient History', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.g800))),
+              GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.close, size: 18, color: AppColors.g400)),
+            ])),
+          Expanded(child: _historyLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _history.isEmpty
+              ? const Center(child: Padding(padding: EdgeInsets.all(24),
+                  child: Text('No risk history recorded yet.', style: TextStyle(color: AppColors.g400))))
+              : ListView.builder(padding: const EdgeInsets.all(20), itemCount: _history.length, itemBuilder: (_, i) {
+                final h = _history[i] as Map<String, dynamic>;
+                final level = h['riskLevel']?.toString() ?? '';
+                final rc = level.contains('High') || level.contains('Seek') ? AppColors.red
+                    : level.contains('Moderate') ? AppColors.orange : AppColors.green;
+                return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: AppColors.bg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.g200)),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Container(width: 7, height: 7, decoration: BoxDecoration(color: rc, shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      Text(level, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: rc)),
+                      const Spacer(),
+                      Text(h['submittedAt']?.toString().substring(0, 10) ?? '', style: const TextStyle(fontSize: 10, color: AppColors.g400)),
+                    ]),
+                    const SizedBox(height: 6),
+                    Text('Score: ${h['score']} Â· ${h['message'] ?? ''}', style: const TextStyle(fontSize: 12, color: AppColors.g800)),
+                  ]));
+              })),
+        ])),
+    ));
   }
 
-  Widget _section(String title, List<Widget> children) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        Container(width: 3, height: 14, color: AppColors.navy,
-            margin: const EdgeInsets.only(right: 8)),
-        Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold,
-            color: AppColors.g800)),
-      ]),
-      const SizedBox(height: 10),
-      ...children,
-    ]);
-  }
+  Widget _section(String title, List<Widget> children) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    Row(children: [Container(width: 3, height: 14, color: AppColors.navy, margin: const EdgeInsets.only(right: 8)),
+      Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.g800))]),
+    const SizedBox(height: 10), ...children,
+  ]);
 
-  Widget _row(IconData icon, String label, String value, {Color valueColor = AppColors.g800}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-      decoration: BoxDecoration(color: AppColors.bg, borderRadius: BorderRadius.circular(8)),
-      child: Row(children: [
-        Icon(icon, size: 15, color: AppColors.navy),
-        const SizedBox(width: 10),
-        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.g600)),
-        const Spacer(),
-        Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600,
-            color: valueColor)),
-      ]),
-    );
-  }
-
-  Widget _tag(String text, Color color, Color bg) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
-      child: Row(children: [
-        Icon(Icons.circle, size: 6, color: color),
-        const SizedBox(width: 8),
-        Text(text, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w500)),
-      ]),
-    );
-  }
-
-  Widget _actions() {
-    return Row(children: [
-      Expanded(child: OutlinedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.assessment_outlined, size: 15),
-        label: const Text('Risk Details', style: TextStyle(fontSize: 12)),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.navy,
-          side: const BorderSide(color: AppColors.navy),
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      )),
-      const SizedBox(width: 8),
-      Expanded(child: OutlinedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.edit_note, size: 15),
-        label: const Text('Update', style: TextStyle(fontSize: 12)),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.g600,
-          side: const BorderSide(color: AppColors.g200),
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      )),
-      const SizedBox(width: 8),
-      Expanded(child: ElevatedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.schedule, size: 15),
-        label: const Text('Schedule', style: TextStyle(fontSize: 12)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.navy, foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          elevation: 0,
-        ),
-      )),
-    ]);
-  }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────────
-
-  void _showHistory(BuildContext context, String name, List<String> symptoms, RiskLevel risk) {
-    final (riskColor, _, riskLabel) = _riskStyle(risk);
-
-    // Per-patient symptom history with risk level and date/time
-    final Map<String, List<Map<String, String>>> symptomHistory = {
-      'Grace Banda': [
-        {'date': '20 Mar 2026', 'time': '10:14 AM', 'risk': 'High',   'symptoms': 'Severe headache, Reduced fetal movement'},
-        {'date': '10 Mar 2026', 'time': '09:00 AM', 'risk': 'Medium', 'symptoms': 'Mild headache, Fatigue'},
-        {'date': '01 Mar 2026', 'time': '02:30 PM', 'risk': 'Low',    'symptoms': 'Mild nausea'},
-      ],
-      'Faith Mwale': [
-        {'date': '18 Mar 2026', 'time': '11:00 AM', 'risk': 'High',   'symptoms': 'Oedema, Proteinuria, Dizziness'},
-        {'date': '05 Mar 2026', 'time': '03:15 PM', 'risk': 'Medium', 'symptoms': 'Swollen feet'},
-      ],
-      'Mercy Tembo': [
-        {'date': '22 Mar 2026', 'time': '08:45 AM', 'risk': 'Medium', 'symptoms': 'Mild fever 37.9°C, Breast tenderness'},
-        {'date': '15 Mar 2026', 'time': '10:00 AM', 'risk': 'Low',    'symptoms': 'Fatigue'},
-      ],
-      'Liness Kachali': [
-        {'date': '19 Mar 2026', 'time': '01:00 PM', 'risk': 'Medium', 'symptoms': 'Gestational diabetes, Fatigue'},
-        {'date': '10 Mar 2026', 'time': '09:30 AM', 'risk': 'Low',    'symptoms': 'Back pain'},
-      ],
-      'Aisha Tembo': [
-        {'date': '17 Mar 2026', 'time': '11:30 AM', 'risk': 'Low',    'symptoms': 'Mild nausea'},
-      ],
-      'Joyce Mwale': [
-        {'date': '21 Mar 2026', 'time': '02:00 PM', 'risk': 'Medium', 'symptoms': 'Fatigue, Back pain'},
-        {'date': '12 Mar 2026', 'time': '10:45 AM', 'risk': 'Low',    'symptoms': 'Mild fatigue'},
-      ],
-      'Rose Phiri': [
-        {'date': '20 Mar 2026', 'time': '09:00 AM', 'risk': 'Low',    'symptoms': 'No symptoms reported'},
-      ],
-      'Fatima Chirwa': [
-        {'date': '22 Mar 2026', 'time': '08:00 AM', 'risk': 'Low',    'symptoms': 'No symptoms reported'},
-      ],
-    };
-
-    // Per-patient IVR call history
-    final Map<String, List<Map<String, String>>> ivrHistory = {
-      'Grace Banda':    [{'date': '20 Mar 2026', 'time': '10:10 AM', 'duration': '3 min 22 sec'}, {'date': '15 Mar 2026', 'time': '02:45 PM', 'duration': '1 min 55 sec'}],
-      'Faith Mwale':    [{'date': '18 Mar 2026', 'time': '10:55 AM', 'duration': '2 min 10 sec'}],
-      'Mercy Tembo':    [{'date': '22 Mar 2026', 'time': '08:40 AM', 'duration': '1 min 30 sec'}, {'date': '15 Mar 2026', 'time': '09:55 AM', 'duration': '2 min 05 sec'}],
-      'Liness Kachali': [{'date': '19 Mar 2026', 'time': '12:55 PM', 'duration': '4 min 00 sec'}],
-      'Aisha Tembo':    [{'date': '17 Mar 2026', 'time': '11:25 AM', 'duration': '1 min 10 sec'}],
-      'Joyce Mwale':    [{'date': '21 Mar 2026', 'time': '01:55 PM', 'duration': '2 min 45 sec'}],
-      'Rose Phiri':     [{'date': '20 Mar 2026', 'time': '08:55 AM', 'duration': '0 min 55 sec'}],
-      'Fatima Chirwa':  [{'date': '22 Mar 2026', 'time': '07:55 AM', 'duration': '1 min 20 sec'}],
-    };
-
-    final patientSymptoms = symptomHistory[name] ?? [];
-    final patientCalls    = ivrHistory[name] ?? [];
-
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 620),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: AppColors.navyL,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Row(children: [
-                const Icon(Icons.history, color: AppColors.navy, size: 20),
-                const SizedBox(width: 10),
-                Expanded(child: Text('$name — Patient History',
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold,
-                        color: AppColors.g800))),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, size: 18, color: AppColors.g400),
-                ),
-              ]),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                  // ── Symptom & Risk History ──────────────────────────────────
-                  _historySection('Symptom & Risk History'),
-                  const SizedBox(height: 10),
-                  if (patientSymptoms.isEmpty)
-                    _historyEmpty('No symptom history recorded.')
-                  else
-                    ...patientSymptoms.map((e) {
-                      final rc = e['risk'] == 'High' ? AppColors.red
-                          : e['risk'] == 'Medium' ? AppColors.orange : AppColors.green;
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(color: AppColors.bg,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.g200)),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Row(children: [
-                            Container(width: 7, height: 7,
-                                decoration: BoxDecoration(color: rc, shape: BoxShape.circle)),
-                            const SizedBox(width: 8),
-                            Text('${e['risk']} Risk',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold,
-                                    color: rc)),
-                            const Spacer(),
-                            Text('${e['date']}  ·  ${e['time']}',
-                                style: const TextStyle(fontSize: 10, color: AppColors.g400)),
-                          ]),
-                          const SizedBox(height: 6),
-                          Text(e['symptoms']!,
-                              style: const TextStyle(fontSize: 12, color: AppColors.g800)),
-                        ]),
-                      );
-                    }),
-
-                  const SizedBox(height: 20),
-
-                  // ── IVR Call History ────────────────────────────────────────
-                  _historySection('IVR Call History'),
-                  const SizedBox(height: 10),
-                  if (patientCalls.isEmpty)
-                    _historyEmpty('No IVR calls recorded.')
-                  else
-                    ...patientCalls.map((c) => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: AppColors.bg,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.g200)),
-                          child: Row(children: [
-                            Container(
-                              width: 34, height: 34,
-                              decoration: BoxDecoration(color: AppColors.navyL,
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: const Icon(Icons.phone_in_talk_outlined,
-                                  color: AppColors.navy, size: 17),
-                            ),
-                            const SizedBox(width: 12),
-                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('${c['date']}  ·  ${c['time']}',
-                                  style: const TextStyle(fontSize: 12,
-                                      fontWeight: FontWeight.w600, color: AppColors.g800)),
-                              const SizedBox(height: 2),
-                              Text('Duration: ${c['duration']}',
-                                  style: const TextStyle(fontSize: 11, color: AppColors.g400)),
-                            ]),
-                          ]),
-                        )),
-                ]),
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  Widget _historySection(String title) {
-    return Row(children: [
-      Container(width: 3, height: 14, color: AppColors.navy,
-          margin: const EdgeInsets.only(right: 8)),
-      Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold,
-          color: AppColors.g800)),
-    ]);
-  }
-
-  Widget _historyEmpty(String msg) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Text(msg, style: const TextStyle(fontSize: 12, color: AppColors.g400)),
-      );
-
-  (Color, Color, String) _riskStyle(RiskLevel r) => switch (r) {
-        RiskLevel.high   => (AppColors.red,    AppColors.redL,    'High'),
-        RiskLevel.medium => (AppColors.orange,  AppColors.orangeL, 'Medium'),
-        RiskLevel.low    => (AppColors.green,   AppColors.greenL,  'Low'),
-      };
-
-  Color _bpColor(String bp) {
-    final parts = bp.split('/');
-    if (parts.isEmpty) return AppColors.g800;
-    final sys = int.tryParse(parts[0].trim()) ?? 0;
-    if (sys >= 140) return AppColors.red;
-    if (sys >= 130) return AppColors.orange;
-    return AppColors.green;
-  }
+  Widget _row(IconData icon, String label, String? value) => Container(
+    margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+    decoration: BoxDecoration(color: AppColors.bg, borderRadius: BorderRadius.circular(8)),
+    child: Row(children: [
+      Icon(icon, size: 15, color: AppColors.navy), const SizedBox(width: 10),
+      Text(label, style: const TextStyle(fontSize: 12, color: AppColors.g600)),
+      const Spacer(),
+      Text(value ?? 'â€”', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.g800)),
+    ]));
 }
+
+
