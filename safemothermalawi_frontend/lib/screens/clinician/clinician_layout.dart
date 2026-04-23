@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
+import '../../state/user_store.dart';
 import 'pages/dashboard_page.dart';
 import 'pages/patients_page.dart';
 import 'pages/alerts_page.dart';
@@ -66,8 +67,8 @@ class _ClinicianDashboardState extends State<ClinicianDashboard> {
         const SizedBox(width: 8),
         GestureDetector(
           onTap: () => setState(() => _selectedIndex = 7),
-          child: const Text('Dr. Rachel',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
+          child: Text(UserStore.instance.fullName.isNotEmpty ? UserStore.instance.fullName : 'My Profile',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
                   color: AppColors.g800)),
         ),
       ]),
