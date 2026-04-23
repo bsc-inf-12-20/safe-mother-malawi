@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_colors.dart';
 import '../../screens/splash_screen.dart';
 import 'sidebar.dart';
+import 'widgets/notification_panel.dart';
 
 void _doLogout(BuildContext context) {
   showDialog(
@@ -94,7 +95,7 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 16),
 
           // Notifications
-          _IconBtn(icon: Icons.notifications_none_rounded, badge: '3', onTap: () {}),
+          const NotificationBell(),
           const SizedBox(width: 8),
 
           // Profile chip — logout UI only, no action (auth pending)
@@ -154,6 +155,8 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
+// _IconBtn kept for potential reuse elsewhere
+// ignore: unused_element
 class _IconBtn extends StatelessWidget {
   final IconData icon;
   final String? badge;
