@@ -3,6 +3,7 @@ import '../../../services/api_service.dart';
 import '../../../services/reminder_service.dart';
 import '../../../widgets/clock_time_picker.dart';
 import '../../auth/services/auth_service.dart';
+import 'busy_response_screen.dart';
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
@@ -148,6 +149,39 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  Future<void> _navigateToBusyResponse(Map<String, dynamic> appointment) async {
+    final appointmentId = appointment['id']?.toString();
+    final title = (appointment['title'] ?? appointment['type'] ?? 'Appointment').toString();
+    final date = DateTime.tryParse(appointment['date'] ?? '') ?? DateTime.now();
+    final time = (appointment['time'] ?? '').toString();
+    
+    if (appointmentId == null || appointmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to process busy response'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BusyResponseScreen(
+          appointmentId: appointmentId,
+          appointmentTitle: title,
+          appointmentDate: _fmtFull(date),
+          appointmentTime: time.isNotEmpty ? time : null,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      _load();
     }
   }
 
@@ -329,6 +363,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
             ),
           ),
           actions: [
+            // I'm Busy button (only for future appointments)
+            if (date.isAfter(DateTime.now()))
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _navigateToBusyResponse(appointment);
+                },
+                child: const Text('I\'m Busy', style: TextStyle(color: Colors.orange)),
+              ),
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Close'),
