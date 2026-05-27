@@ -204,7 +204,7 @@ class _CreateBroadcastDialogState extends State<_CreateBroadcastDialog> {
   Future<void> _loadDistricts() async {
     setState(() => _isLoadingDistricts = true);
     try {
-      final res = await ApiService.instance.get('/notifications/broadcasts/districts/available');
+      final res = await ApiService.instance.get('/push-notifications/broadcast/districts/available');
       if (mounted) {
         setState(() {
           _availableDistricts = List<String>.from(res['districts'] ?? []);
@@ -212,6 +212,7 @@ class _CreateBroadcastDialogState extends State<_CreateBroadcastDialog> {
         });
       }
     } catch (e) {
+      print('[BroadcastDialog] Error loading districts: $e');
       if (mounted) {
         setState(() => _isLoadingDistricts = false);
       }
