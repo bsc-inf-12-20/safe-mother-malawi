@@ -259,24 +259,44 @@ class _SystemUsersState extends State<SystemUsers> {
           ],
 
           if (_editingUser != null) ...[
-            _EditUserForm(
-              user: _editingUser!,
-              onSubmit: (data) async {
-                try {
-                  await ApiService.instance.patch('/users/${_editingUser!['id']}', data);
-                  setState(() { _editingUser!.addAll(data); _editingUser = null; });
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('User updated'),
-                      backgroundColor: AppColors.successText,
-                    ));
+            if (['admin', 'dho', 'clinician'].contains((_editingUser!['role'] ?? '').toString().toLowerCase()))
+              _EditUserForm(
+                user: _editingUser!,
+                onSubmit: (data) async {
+                  try {
+                    await ApiService.instance.patch('/users/${_editingUser!['id']}', data);
+                    setState(() { _editingUser!.addAll(data); _editingUser = null; });
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('User updated'),
+                        backgroundColor: AppColors.successText,
+                      ));
+                    }
+                  } catch (e) {
+                    _showErr('Failed to update: $e');
                   }
-                } catch (e) {
-                  _showErr('Failed to update: $e');
-                }
-              },
-              onCancel: () => setState(() => _editingUser = null),
-            ),
+                },
+                onCancel: () => setState(() => _editingUser = null),
+              )
+            else
+              _EditMobileUserForm(
+                user: _editingUser!,
+                onSubmit: (data) async {
+                  try {
+                    await ApiService.instance.patch('/users/${_editingUser!['id']}', data);
+                    setState(() { _editingUser!.addAll(data); _editingUser = null; });
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('User updated'),
+                        backgroundColor: AppColors.successText,
+                      ));
+                    }
+                  } catch (e) {
+                    _showErr('Failed to update: $e');
+                  }
+                },
+                onCancel: () => setState(() => _editingUser = null),
+              ),
             const SizedBox(height: 20),
           ],
 
@@ -385,13 +405,19 @@ class _SystemUsersState extends State<SystemUsers> {
                                       _ActionBtn(icon: Icons.delete_outline_rounded, color: AppColors.criticalText, tooltip: 'Delete',
                                           onTap: () => _deleteUser(u)),
                                     ] else ...[
-                                      // Mobile users (prenatal/neonatal) - view only
+                                      // Mobile users (prenatal/neonatal) - view, edit, delete
                                       _ActionBtn(
                                         icon: Icons.visibility_outlined,
                                         color: AppColors.primary,
                                         tooltip: 'View Details',
                                         onTap: () => _showUserDetails(u),
                                       ),
+                                      const SizedBox(width: 4),
+                                      _ActionBtn(icon: Icons.edit_outlined, color: AppColors.primary, tooltip: 'Edit',
+                                          onTap: () => setState(() { _showForm = false; _editingUser = u; })),
+                                      const SizedBox(width: 4),
+                                      _ActionBtn(icon: Icons.delete_outline_rounded, color: AppColors.criticalText, tooltip: 'Delete',
+                                          onTap: () => _deleteUser(u)),
                                     ],
                                   ])),
                                 ]),
@@ -1153,6 +1179,106 @@ class _EditUserFormState extends State<_EditUserForm> {
               'region':   _region,
               'zone':     _zone,
               'district': _district,
+            }) : null,
+          ),
+          const SizedBox(width: 12),
+          TextButton(onPressed: widget.onCancel,
+              child: Text('Cancel', style: TextStyle(fontFamily: 'Roboto', fontSize: 13, color: AppColors.mutedText))),
+        ]),
+      ]),
+    );
+  }
+}
+
+// ── Edit Mobile User Form ────────────────────────────────────────────────────
+
+class _EditMobileUserForm extends StatefulWidget {
+  final Map<String, dynamic> user;
+  final ValueChanged<Map<String, dynamic>> onSubmit;
+  final VoidCallback onCancel;
+  const _EditMobileUserForm({required this.user, required this.onSubmit, required this.onCancel});
+
+  @override
+  State<_EditMobileUserForm> createState() => _EditMobileUserFormState();
+}
+
+class _EditMobileUserFormState extends State<_EditMobileUserForm> {
+  late final TextEditingController _fullName;
+  late final TextEditingController _email;
+  late final TextEditingController _phone;
+  late final TextEditingController _dateOfBirth;
+  late final TextEditingController _address;
+
+  @override
+  void initState() {
+    super.initState();
+    _fullName = TextEditingController(text: widget.user['fullName'] ?? '');
+    _email = TextEditingController(text: widget.user['email'] ?? '');
+    _phone = TextEditingController(text: widget.user['phone'] ?? '');
+    _dateOfBirth = TextEditingController(text: widget.user['dateOfBirth'] ?? '');
+    _address = TextEditingController(text: widget.user['address'] ?? '');
+  }
+
+  @override
+  void dispose() {
+    _fullName.dispose();
+    _email.dispose();
+    _phone.dispose();
+    _dateOfBirth.dispose();
+    _address.dispose();
+    super.dispose();
+  }
+
+  bool get _valid =>
+      _fullName.text.trim().isNotEmpty &&
+      _validateFullName(_fullName.text.trim()) == null &&
+      _phone.text.trim().isNotEmpty &&
+      _validatePhone(_phone.text.trim()) == null;
+
+  @override
+  Widget build(BuildContext context) {
+    final role = (widget.user['role'] ?? 'prenatal').toString();
+    
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.4), width: 1.5),
+        boxShadow: const [BoxShadow(color: AppColors.shadowColor, blurRadius: 24, offset: Offset(0, 4))],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.edit_rounded, size: 16, color: AppColors.accent),
+          const SizedBox(width: 8),
+          Text('Edit ${role.toUpperCase()} User',
+              style: TextStyle(fontFamily: 'Public Sans', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.headings)),
+        ]),
+        const SizedBox(height: 20),
+
+        _SectionLabel('Personal Information'),
+        const SizedBox(height: 10),
+        Wrap(spacing: 16, runSpacing: 16, children: [
+          _TF(label: 'Full Name', ctrl: _fullName, hint: 'Jane Banda', validator: _validateFullName),
+          _TF(label: 'Phone', ctrl: _phone, hint: '0999000000', keyboard: TextInputType.phone,
+              validator: _validatePhone),
+          _TF(label: 'Email', ctrl: _email, hint: 'jane@example.com', keyboard: TextInputType.emailAddress,
+              validator: (v) => Validators.validateEmail(v, required: false)),
+          _TF(label: 'Date of Birth', ctrl: _dateOfBirth, hint: 'YYYY-MM-DD', keyboard: TextInputType.datetime),
+          _TF(label: 'Address', ctrl: _address, hint: 'Street address'),
+        ]),
+        const SizedBox(height: 24),
+
+        Row(children: [
+          _GradientBtn(
+            label: 'Save Changes',
+            icon: Icons.save_rounded,
+            onTap: _valid ? () => widget.onSubmit({
+              'fullName': _fullName.text.trim(),
+              'phone': _phone.text.trim(),
+              'email': _email.text.trim().isEmpty ? null : _email.text.trim(),
+              'dateOfBirth': _dateOfBirth.text.trim().isEmpty ? null : _dateOfBirth.text.trim(),
+              'address': _address.text.trim().isEmpty ? null : _address.text.trim(),
             }) : null,
           ),
           const SizedBox(width: 12),
