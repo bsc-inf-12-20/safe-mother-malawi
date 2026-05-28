@@ -831,19 +831,24 @@ class _EditClinicianFormState extends State<_EditClinicianForm> {
           _GradientBtn(
             label: 'Save Changes',
             icon: Icons.save_rounded,
-            onTap: () => widget.onSubmit({
-              'fullName': _name.text.trim(),
-              'phone':    _phone.text.trim(),
-              'email':    _email.text.trim().isEmpty ? null : _email.text.trim(),
-              'region':   _region,
-              'zone':     _zone,
-              'district': _district,
-              if (_selectedFacility != null) ...{
-                'facilityName': _selectedFacility!['facilityName']?.toString() ?? '',
-                'urbanRural': _selectedFacility!['urbanRural']?.toString() ?? '',
-                'facilityType': _selectedFacility!['facilityType']?.toString() ?? '',
-              },
-            }),
+            onTap: () {
+              final submitData = {
+                'fullName': _name.text.trim(),
+                'phone':    _phone.text.trim(),
+                'email':    _email.text.trim().isEmpty ? null : _email.text.trim(),
+                'region':   _region,
+                'zone':     _zone,
+                'district': _district,
+              };
+              
+              if (_selectedFacility != null) {
+                submitData['facilityName'] = _selectedFacility!['facilityName']?.toString() ?? '';
+                submitData['urbanRural'] = _selectedFacility!['urbanRural']?.toString() ?? '';
+                submitData['facilityType'] = _selectedFacility!['facilityType']?.toString() ?? '';
+              }
+              
+              widget.onSubmit(submitData);
+            },
           ),
           const SizedBox(width: 12),
           TextButton(onPressed: widget.onCancel,
